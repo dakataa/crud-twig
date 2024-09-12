@@ -1,0 +1,23 @@
+{
+  "name": "dakataa/crud-twig",
+  "description": "Symfony CRUD Frontend based on Twig",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Dakataa\\Crud\\Twig\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Yordan Lazarov",
+      "email": "yor.lazarov@gmail.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=8.1",
+    "twig/twig": "^3.8",
+    "symfony/framework-bundle": "^7.0"
+  }
+}
