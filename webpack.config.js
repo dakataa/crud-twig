@@ -4,7 +4,7 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const SpriteLoaderPlugin = require('svg-sprite-loader/plugin');
 
 const ASSET_OUTPUT_PATH = 'public/assets/';
-const ASSET_PUBLIC_PATH = '/bundles/dakataacrud/assets';
+const ASSET_PUBLIC_PATH = '/bundles/dakataacrudtwig/assets';
 
 if (!Encore.isRuntimeEnvironmentConfigured()) {
     Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
@@ -13,7 +13,7 @@ if (!Encore.isRuntimeEnvironmentConfigured()) {
 Encore
     .setOutputPath(ASSET_OUTPUT_PATH)
     .setPublicPath(ASSET_PUBLIC_PATH)
-	.setManifestKeyPrefix('bundles/dakataacrud')
+	.setManifestKeyPrefix('bundles/dakataacrudtwig')
     .cleanupOutputBeforeBuild()
     .enableLessLoader()
     .disableSingleRuntimeChunk()

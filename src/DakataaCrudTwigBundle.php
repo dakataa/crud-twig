@@ -53,7 +53,7 @@ class DakataaCrudTwigBundle extends AbstractBundle
 			'assets' => [
 				'packages' => [
 					self::NAME => [
-						'json_manifest_path' => '%kernel.project_dir%/public/bundles/dakataacrud/assets/manifest.json'
+						'json_manifest_path' => '%kernel.project_dir%/public/bundles/dakataacrudtwig/assets/manifest.json'
 					]
 				]
 			]
