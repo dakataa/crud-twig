@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
 class DakataaCrudTwigBundle extends AbstractBundle
 {
-	const NAME = 'dakataa_crud';
+	const NAME = 'dakataa_crud_twig';
 
 	public function configure(DefinitionConfigurator $definition): void
 	{
