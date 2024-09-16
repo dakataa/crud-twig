@@ -1,4 +1,4 @@
-{% extends [getParameter('layout')|default(''), '@DakataaCrud/layout/default.html.twig'] %}
+{% extends [getParameter('layout')|default(''), '@DakataaCrudTwig/layout/default.html.twig'] %}
 {% block title %}{{ (title ?? 'List')|trans }}{% endblock %}
 {% macro displayFormFieldValue(formField) %}
     {% if formField.vars.choices is defined %}
@@ -192,7 +192,7 @@
         </div>
 
         <div class="d-flex justify-content-center">
-            {% include '@DakataaCrud/paginator.html.twig' with { data: entity.data, route: 'list'} %}
+            {% include '@DakataaCrudTwig/paginator.html.twig' with { data: entity.data, route: 'list'} %}
         </div>
 
         {{ form_end(form.batch.view, {'render_rest': false}) }}

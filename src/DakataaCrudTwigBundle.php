@@ -37,6 +37,11 @@ class DakataaCrudTwigBundle extends AbstractBundle
 			->tag('twig.extension')
 			->autowire();
 
+		$container
+			->services()
+			->set(TemplateProvider::class, TemplateProvider::class)
+			->autowire();
+
 		$container->parameters()->set(self::NAME, $config);
 	}
 

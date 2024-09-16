@@ -2,6 +2,7 @@
 
 namespace Dakataa\Crud\Twig;
 
+use Dakataa\Crud\Controller\AbstractCrudController;
 use Exception;
 use Symfony\Component\DependencyInjection\Container;
 use Twig\Environment;
@@ -28,7 +29,7 @@ class TemplateProvider
 		);
 	}
 
-	protected function getTemplate(string $template, string $fallbackTemplate = null): string
+	protected function getTemplate(AbstractCrudController $controller, string $template, string $fallbackTemplate = null): string
 	{
 		if (!$this->twig) {
 			throw new Exception('Missing Twig Templating Engine.');
@@ -36,14 +37,19 @@ class TemplateProvider
 
 		$templatePath = sprintf(
 			'%s/%s.html.twig',
-			$this->getTemplateDirectoryByClass($this->getControllerClass()),
+			$this->getTemplateDirectoryByClass($controller::class),
 			$template
 		);
 
 		if (!$this->twig->getLoader()->exists($templatePath)) {
-			$templatePath = sprintf('@DakataaCrud/%s.html.twig', $fallbackTemplate ?: $template);
+			$templatePath = sprintf('@DakataaCrudTwig/%s.html.twig', $fallbackTemplate ?: $template);
 		}
 
 		return $templatePath;
+	}
+
+	public function render(AbstractCrudController $controller, string $template, array $context, string $fallbackTemplate = null): string
+	{
+		return $this->twig->render($this->getTemplate($controller, $template, $fallbackTemplate), $context);
 	}
 }
