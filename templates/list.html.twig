@@ -1,4 +1,4 @@
-{% extends [getParameter('layout')|default(''), '@DakataaCrudTwig/layout/default.html.twig'] %}
+{% extends [getParameter('layout')|default(''), '@DakataaCrudTwig/layout/default/auto.html.twig'] %}
 {% block title %}{{ (title ?? 'List')|trans }}{% endblock %}
 {% macro displayFormFieldValue(formField) %}
     {% if formField.vars.choices is defined %}
@@ -37,48 +37,53 @@
     <div class="list">
         <div class="content-header d-md-flex mb-3 justify-content-between align-items-center">
             <h2>
-                {% block list_title %}
+                {% block body_title %}
                     {{ block('title') }}
                 {% endblock %}
             </h2>
-            <div class="btn-group btn-group-sm">
-                {% for action in action|filter(a => false == a.object) %}
-                    <a href="{{ generatePath(action.name) }}"
-                       class="btn btn-sm btn-outside-secondary">
-                        <i class="fas fa-eye"></i>
-                        {{ action.title|trans }}
-                    </a>
-                {% endfor %}
+
+            {% block body_navigation %}
+            <div class="d-flex align-items-center">
+                <div class="btn-group btn-group-sm me-2">
+                    {% for action in action|filter(a => false == a.object) %}
+                        <a href="{{ generatePath(action.name) }}" class="btn btn-outline-secondary">
+                            {{ action.title|trans }}
+                        </a>
+                    {% endfor %}
+                </div>
 
                 {% if form.filter %}
-                    <div class="btn-group btn-group-sm">
-                        <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                <div class="btn-group btn-group-sm">
+                    <div class="dropdown {% if hasFilters %}btn-group{% endif %}">
+                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside">
                             {{ 'Filter'|trans }}
                         </button>
-
-                        <div class="dropdown-menu dropdown-menu-right" aria-label="menu">
+                        <div class="dropdown-menu dropdown-menu-right">
                             <div class="filter">
                                 {{ form_start(form.filter.view, { attr: {'novalidate': 'novalidate'}}) }}
                                 {{ form_rest(form.filter.view) }}
-                                <div class="mb-3 btn-group-sm">
+                                <div class="mb-3">
                                     <button type="submit" class="btn btn-success me-2">{{ 'Search'|trans }}</button>
                                     {% if hasFilters %}
-                                        <a class="btn btn-default"
-                                           href="{{ generatePath('list', { filter: '' }) }}">{{ 'Reset'|trans }}</a>
+                                        <a class="btn btn-default" href="{{ generatePath('list', { filter: '' }) }}">{{ 'Reset'|trans }}</a>
                                     {% endif %}
                                 </div>
                                 {{ form_end(form.filter.view) }}
                             </div>
                         </div>
                     </div>
-                {% endif %}
-                {% if hasFilters %}
-                    <a href="{{ generatePath('list', { filter: '' }) }}" class="btn btn-outline-dark">x</a>
+                    {% if hasFilters %}
+                        <a href="{{ generatePath('list', { filter: '' }) }}" class="btn btn-outline-dark">x</a>
+                    {% endif %}
+                </div>
                 {% endif %}
             </div>
+            {% endblock %}
         </div>
 
+        {% block form_start %}
         {{ form_start(form.batch.view, { attr: {novalidate: 'novalidate', autocomplete:'off'}}) }}
+        {% endblock %}
 
         {% if hasFilters %}
             <div class="filters d-flex mb-sm overflow-auto">
@@ -126,7 +131,8 @@
                             <tr id="row_{{ loop.index }}">
                                 {% if rowIdentifier and form.batch.view.method is defined %}
                                     <td>
-                                        <input type="checkbox" class="ids" name="batch[ids][]" value="{{ rowIdentifier }}"/>
+                                        <input type="checkbox" class="ids" name="batch[ids][]"
+                                               value="{{ rowIdentifier }}"/>
                                     </td>
                                 {% endif %}
                                 {% for column in entity.columns %}
@@ -146,15 +152,19 @@
                                     {% endif %}
                                 {% endfor %}
                                 {% if rowIdentifier and action|keys|length %}
-                                <td class="text-end">
-                                    {% for action in action|filter(a => a.object) %}
-                                        <a href="{{ generatePath(action.name, {id: rowIdentifier}) }}"
-                                           class="btn btn-sm btn-outside-secondary">
-                                            <i class="fas fa-eye"></i>
-                                            {{ action.title|trans }}
-                                        </a>
-                                    {% endfor %}
-                                </td>
+                                    <td class="text-end">
+                                        {% for action in action|filter(a => a.object) %}
+                                            {% if 'DELETE' in action.route.methods %}
+                                                <a href="{{ generatePath(action.name, {id: rowIdentifier}) }}" class="btn btn-sm btn-outline-danger" data-toggle="ajax" data-method="DELETE" data-confirm="Are you sure?">
+                                                    {{ action.title|trans }}
+                                                </a>
+                                            {% else %}
+                                                <a data-bs-toggle="modal" href="{{ generatePath(action.name, {id: rowIdentifier}) }}" class="btn btn-sm btn-outline-secondary">
+                                                    {{ action.title|trans }}
+                                                </a>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
                                 {% endif %}
                             </tr>
                         {% endfor %}
@@ -177,7 +187,6 @@
                 <div class="btn-group me-2 mb-2">
                     <div class="input-group flex-nowrap">
                         {{ form_widget(form.batch.view.method, {attr: {class: 'form-control'}}) }}
-
                         <button type="submit" class="btn btn-outline-secondary">{{ 'Go'|trans }}</button>
                     </div>
                 </div>
@@ -194,8 +203,9 @@
         <div class="d-flex justify-content-center">
             {% include '@DakataaCrudTwig/paginator.html.twig' with { data: entity.data, route: 'list'} %}
         </div>
-
+        {% block form_end %}
         {{ form_end(form.batch.view, {'render_rest': false}) }}
+        {% endblock %}
     </div>
     <script type="text/javascript">
 		let resultsLimit = document.querySelector('#results-limit');

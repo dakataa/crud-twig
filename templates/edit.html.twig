@@ -1,4 +1,4 @@
-{% extends [getParameter('layout')|default(''), '@DakataaCrudTwig/layout/default.html.twig'] %}
+{% extends [getParameter('layout')|default(''), '@DakataaCrudTwig/layout/default/auto.html.twig'] %}
 
 {%- block title -%}
     {% if (object is defined) and object.id|default(false) != false %}{{ 'Edit'|trans }}{% else %}{{ 'Add'|trans }}{% endif %}
@@ -15,7 +15,7 @@
                             {{ block('title') }}
                         {% endblock %}
                     </h2>
-                    {% block navigation %}
+                    {% block body_navigation %}
                         <nav class="nav">
                             {% block tab_navigation_tabs %}
                             {% endblock %}
@@ -34,10 +34,12 @@
                     {{ form_start(form.modify.view, { action: app.request.uri, 'attr': { novalidate: 'novalidate', autocomplete: 'off', 'data-ajax':'true', 'data-submit': 'true'}}) }}
                 {% endblock %}
                 <div class="tab-content">
-                    {% block tabs %}
+                    {% block tabs_content %}
                         <div id="edit" class="tab tab-pane active in">
-                            {% block form %}
-                                {{ form_rest(form.modify.view) }}
+                            {% block content %}
+                                {% block form_body %}
+                                    {{ form_rest(form.modify.view) }}
+                                {% endblock %}
                             {% endblock %}
                         </div>
                     {% endblock %}

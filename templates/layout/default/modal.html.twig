@@ -1,0 +1,32 @@
+<div class="modal-dialog">
+    {% if block('form_start') is defined and form is defined %}
+        {{ block('form_start') }}
+    {% endif %}
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title">{% block title %}{% endblock %}</h4>
+            <div class="nav">
+                {% block navigation %}{% endblock %}
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+            </button>
+        </div>
+        <div class="modal-body tabs">
+            <div class="wrap tab-content">
+                {% block tabs_content %}
+                    {% block content %}{% endblock %}
+                {% endblock %}
+            </div>
+        </div>
+        {% block footer %}
+            {% if block('actions') is defined %}
+                <div class="modal-footer">
+                    {{ block('actions') }}
+                </div>
+            {% endif %}
+        {% endblock %}
+    </div>
+    {% if block('form_end') is defined  and form is defined %}
+        {{ block('form_end') }}
+    {% endif %}
+</div>

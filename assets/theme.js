@@ -1,2 +1,2 @@
-import 'bootstrap';
 import './scss/theme.scss';
+import './js/index';

@@ -49,14 +49,19 @@ class DakataaCrudTwigBundle extends AbstractBundle
 		ContainerConfigurator $container,
 		ContainerBuilder $builder
 	): void {
+		$builder->prependExtensionConfig('twig', [
+			'form_themes' => [
+				'bootstrap_5_layout.html.twig',
+			],
+		]);
 		$builder->prependExtensionConfig('framework', [
 			'assets' => [
 				'packages' => [
 					self::NAME => [
-						'json_manifest_path' => '%kernel.project_dir%/public/bundles/dakataacrudtwig/assets/manifest.json'
-					]
-				]
-			]
+						'json_manifest_path' => '%kernel.project_dir%/public/bundles/dakataacrudtwig/assets/manifest.json',
+					],
+				],
+			],
 		]);
 	}
 }

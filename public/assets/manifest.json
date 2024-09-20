@@ -1,3 +1,17 @@
 {
-  "bundles/dakataacrudtwig/theme.js": "/bundles/dakataacrudtwig/assets/theme.51b5fac9.js"
+  "bundles/dakataacrudtwig/theme.js": "/bundles/dakataacrudtwig/assets/theme.437e33d8.js",
+  "bundles/dakataacrudtwig/assets_js_component_dataFetcher_js.83e9e9f8.js": "/bundles/dakataacrudtwig/assets/assets_js_component_dataFetcher_js.83e9e9f8.js",
+  "bundles/dakataacrudtwig/assets_js_component_ajaxValidator_js.8ea8e28e.js": "/bundles/dakataacrudtwig/assets/assets_js_component_ajaxValidator_js.8ea8e28e.js",
+  "bundles/dakataacrudtwig/vendors-node_modules_bootstrap_js_src_tab_js.3a976e8b.js": "/bundles/dakataacrudtwig/assets/vendors-node_modules_bootstrap_js_src_tab_js.3a976e8b.js",
+  "bundles/dakataacrudtwig/vendors-node_modules_bootstrap_js_src_collapse_js.aece9f94.js": "/bundles/dakataacrudtwig/assets/vendors-node_modules_bootstrap_js_src_collapse_js.aece9f94.js",
+  "bundles/dakataacrudtwig/vendors-node_modules_bootstrap_js_src_dropdown_js.553d64b3.js": "/bundles/dakataacrudtwig/assets/vendors-node_modules_bootstrap_js_src_dropdown_js.553d64b3.js",
+  "bundles/dakataacrudtwig/vendors-node_modules_bootstrap_js_src_modal_js.9c869282.js": "/bundles/dakataacrudtwig/assets/vendors-node_modules_bootstrap_js_src_modal_js.9c869282.js",
+  "bundles/dakataacrudtwig/assets_js_component_modal_dataFetcher_js.75026e4f.js": "/bundles/dakataacrudtwig/assets/assets_js_component_modal_dataFetcher_js.75026e4f.js",
+  "bundles/dakataacrudtwig/vendors-node_modules_bootstrap_js_src_tooltip_js.0712647c.js": "/bundles/dakataacrudtwig/assets/vendors-node_modules_bootstrap_js_src_tooltip_js.0712647c.js",
+  "bundles/dakataacrudtwig/vendors-node_modules_core-js_internals_fix-regexp-well-known-symbol-logic_js-node_modules_cor-028aab.2772d543.js": "/bundles/dakataacrudtwig/assets/vendors-node_modules_core-js_internals_fix-regexp-well-known-symbol-logic_js-node_modules_cor-028aab.2772d543.js",
+  "bundles/dakataacrudtwig/vendors-node_modules_core-js_internals_does-not-exceed-safe-integer_js-node_modules_core-js_m-49ce7e.1b6f51f5.js": "/bundles/dakataacrudtwig/assets/vendors-node_modules_core-js_internals_does-not-exceed-safe-integer_js-node_modules_core-js_m-49ce7e.1b6f51f5.js",
+  "bundles/dakataacrudtwig/vendors-node_modules_bootstrap_js_src_base-component_js-node_modules_bootstrap_js_src_dom_sel-d471f7.66cb0b2c.js": "/bundles/dakataacrudtwig/assets/vendors-node_modules_bootstrap_js_src_base-component_js-node_modules_bootstrap_js_src_dom_sel-d471f7.66cb0b2c.js",
+  "bundles/dakataacrudtwig/vendors-node_modules_popperjs_core_lib_index_js-node_modules_core-js_modules_es_number_parse--7005c5.8dabc3d9.js": "/bundles/dakataacrudtwig/assets/vendors-node_modules_popperjs_core_lib_index_js-node_modules_core-js_modules_es_number_parse--7005c5.8dabc3d9.js",
+  "bundles/dakataacrudtwig/vendors-node_modules_babel_runtime_regenerator_index_js-node_modules_core-js_modules_es_array-826757.4f22dd9c.js": "/bundles/dakataacrudtwig/assets/vendors-node_modules_babel_runtime_regenerator_index_js-node_modules_core-js_modules_es_array-826757.4f22dd9c.js",
+  "bundles/dakataacrudtwig/vendors-node_modules_babel_runtime_helpers_typeof_js-node_modules_core-js_modules_es_string_r-10a801.fb180140.js": "/bundles/dakataacrudtwig/assets/vendors-node_modules_babel_runtime_helpers_typeof_js-node_modules_core-js_modules_es_string_r-10a801.fb180140.js"
 }
