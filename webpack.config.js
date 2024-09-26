@@ -9,7 +9,6 @@ const ASSET_PUBLIC_PATH = '/bundles/dakataacrudtwig/assets';
 if (!Encore.isRuntimeEnvironmentConfigured()) {
     Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
 }
-
 Encore
     .setOutputPath(ASSET_OUTPUT_PATH)
     .setPublicPath(ASSET_PUBLIC_PATH)
@@ -46,7 +45,8 @@ Encore
     .enableVersioning(true)
     .enableSourceMaps(!Encore.isProduction())
     .addEntry('theme', [
-        './assets/theme.js',
+        './assets/js/index.js',
+		'./assets/scss/theme.scss',
     ])
     .addPlugin(new Webpack.DefinePlugin({
         'process.env.WEBPACK_PUBLIC_PATH': JSON.stringify(ASSET_PUBLIC_PATH)

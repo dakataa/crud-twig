@@ -3,11 +3,10 @@
 <head>
     <title>{% block title %}Admin{% endblock %}</title>
     <meta charset="utf-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"/>
     {% block stylesheets %}
-        <link href="{{ asset('bundles/dakataacrudtwig/theme.css', 'dakataa_crud_twig') }}" rel="stylesheet" type="text/css"/>
     {% endblock %}
+    <script defer type="text/javascript" src="{{ asset('bundles/dakataacrudtwig/theme.js', 'dakataa_crud_twig') }}"></script>
 </head>
 <body>
 <header>
@@ -97,8 +96,6 @@
         Loading...
     </div>
 </div>
-
-<script type="text/javascript" src="{{ asset('bundles/dakataacrudtwig/theme.js', 'dakataa_crud_twig') }}"></script>
 
 {% block javascripts %}
     <script type="text/javascript">

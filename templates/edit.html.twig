@@ -10,7 +10,7 @@
             <header>
                 <div class="wrap">
                     <h2 class="title">
-                        <a href="javascript:history.back()">&larr;</a>
+                        <a href="{{ generatePath('list') }}">&larr;</a>
                         {% block body_title %}
                             {{ block('title') }}
                         {% endblock %}
@@ -31,7 +31,7 @@
         <main class="tabs">
             <div class="wrap">
                 {% block form_start %}
-                    {{ form_start(form.modify.view, { action: app.request.uri, 'attr': { novalidate: 'novalidate', autocomplete: 'off', 'data-ajax':'true', 'data-submit': 'true'}}) }}
+                    {{ form_start(form.modify.view, { action: app.request.uri, 'attr': { novalidate: 'novalidate', autocomplete: 'off', 'data-ajax':'true', 'data-callback': 'true'}}) }}
                 {% endblock %}
                 <div class="tab-content">
                     {% block tabs_content %}

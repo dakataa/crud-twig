@@ -1,5 +1,5 @@
 {% set layout = "index.html.twig" %}
 {% if app.request.isXmlHttpRequest %}
-    {% set layout = app.request.headers.has('modal-dialog')?'modal.html.twig':'empty.html.twig' %}
+    {% set layout = app.request.headers.has('modal-dialog') ? 'modal.html.twig' : 'empty.html.twig' %}
 {% endif %}
 {% extends '@DakataaCrudTwig/layout/default/' ~ layout %}

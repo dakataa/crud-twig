@@ -4,7 +4,7 @@ let listeners = [],
     MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
     observer = new MutationObserver(observe);
 
-observer.observe(document.body, {
+observer.observe(document, {
     childList: true,
     subtree: true
 });

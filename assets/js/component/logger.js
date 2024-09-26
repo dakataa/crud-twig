@@ -1,7 +1,7 @@
-const environment = process.env.NODE_ENV || 'development';
+const environment = process.env.NODE_ENV || 'dev';
 export default {
     info: (...args) => {
-        if (environment !== 'development') {
+        if (environment !== 'dev') {
             return;
         }
 
@@ -9,7 +9,7 @@ export default {
     },
 
     debug: (...args) => {
-        if (environment !== 'development') {
+        if (environment !== 'dev') {
             return;
         }
 

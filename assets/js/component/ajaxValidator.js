@@ -86,7 +86,8 @@
         };
 
         let headers = [
-            {name: 'x-requested-with', value: 'XMLHttpRequest'}
+			{name: 'x-requested-with', value: 'XMLHttpRequest'},
+			{name: 'accept', value: 'application/json'}
         ];
 
         let formData = window.FormData !== undefined ? new FormData(form) : buildFormData(form);
@@ -172,16 +173,12 @@
     }
 
     const responseHandler = (e) => {
-        if (!e.target.getResponseHeader("ajax-validator")) {
-            return;
-        }
-
         validateResponse(e);
     }
 
 
     const validateResponse = (e, formNode, options) => {
-        let request = e.target;
+        const request = e.target;
         if (request.withCredentials) {
             return;
         }
@@ -191,31 +188,34 @@
                 // Clear previous errors
                 clearValidatorErrors();
 
-                let json;
-                if (request.responseType === 'json') {
-                    json = request.response;
-                } else {
-                    json = JSON.parse(request.response);
-                }
+                const json = (request.responseType === 'json' ? request.response : JSON.parse(request.response));
 
-                const processForm = (formNode, json, options) => {
-                    let action = formNode.action || location.href,
-                        formFieldId = formNode.name,
-                        hasErrors = false;
+                const processForm = (formNode, formView, options) => {
+                    let action = formNode.action || location.href;
+
+					const updateForm = (formView) => {
+						if(!formView.valid) {
+							addError(formNode, formView.id, (formView.errors || []));
+							hasError = true;
+						}
+
+						Object.values(formView.children || []).forEach((children) => {
+							updateForm(children);
+						})
+					}
 
                     options = options || getFormOptions(formNode);
-                    if (json.errors && json.errors[formFieldId] && Object.keys(json.errors[formFieldId]).length) {
-                        validatorError(formNode, formFieldId, json.errors[formFieldId]);
-                        hasErrors = true;
+                    if (!formView.valid) {
+						updateForm(formView)
 
                         //Callback ERROR
                         if (options.callbackErr) {
                             if (typeof window[options.callbackErr] === 'function') {
-                                window[options.callbackErr].call(this, json);
+                                window[options.callbackErr].call(this, formView);
                             }
                         }
 
-                        formNode.dispatchEvent(new CustomEvent('error', {detail: json}));
+                        formNode.dispatchEvent(new CustomEvent('error', {detail: formView}));
 
                         // Enable buttons
                         formNode.querySelectorAll('button[type="submit"]').forEach(function (btn) {
@@ -232,9 +232,9 @@
 
                         delete formNode.dataset.submitted;
                     } else {
-                        let objectData = (json.data || json);
+                        let objectData = (formView.data || formView);
                         if (!options.callback) {
-                            if (hasErrors === false && (options.refresh === true || options.submit === true)) {
+                            if (options.refresh === true || options.submit === true) {
                                 if (action && options.submit === true) {
                                     document.onsubmit = null;
                                     formNode.submit();
@@ -242,11 +242,9 @@
                                     location.reload();
                                 }
                             }
-                        } else if (!hasErrors) {
-                            if (window[options.callback] !== undefined) {
-                                window[options.callback].call(this, objectData);
-                            }
-                        }
+                        } else if (window[options.callback] !== undefined) {
+							window[options.callback].call(this, objectData);
+						}
 
                         try {
                             formNode.dispatchEvent(new CustomEvent('success', {detail: objectData}));
@@ -258,31 +256,15 @@
                 }
 
                 if (formNode) {
-                    processForm(formNode, json, options)
+					const formData = Object.values(json.form).find((form) => form.view.full_name === formNode.name);
+					processForm(formNode, formData.view, options)
                 } else {
-                    if (json.errors === undefined) {
-                        return;
-                    }
-
-                    for (let formFieldId in json.errors) {
-                        let node = document.querySelector("[id^='" + formFieldId + "_']");
-                        let formNode = node.parentNode;
-
-                        while (formNode && formNode.tagName.search(/FORM|DOCUMENT/) === -1) {
-                            formNode = formNode.parentNode;
-                        }
-
-                        if (!formNode || formNode.tagName !== 'FORM') {
-                            return;
-                        }
-
-                        if (!json.errors.hasOwnProperty(formFieldId)) {
-                            continue;
-                        }
-
-                        processForm(formNode, json, options)
-                    }
+					json.form.forEach((formData) => {
+						const formNode = document.querySelector(formData.view.id);
+						processForm(formNode, formData.view, options)
+					});
                 }
+
                 break;
             }
             default: {
@@ -294,7 +276,7 @@
     function getDataset(node) {
         let data = {};
         Object.keys(node.dataset).map(function (key) {
-            let v = node.dataset[key];
+            const v = node.dataset[key];
             data[key] = v === 'true' ? true : v === 'false' ? false : v;
         });
         return data;
@@ -324,28 +306,13 @@
         });
     }
 
-    function validatorError(formNode, formFieldId, messages) {
-        for (let messagesKey in messages) {
-            if (!messages.hasOwnProperty(messagesKey)) {
-                continue;
-            }
+    function addError(formNode, formFieldId, messages) {
+		if(!messages.length) {
+			return;
+		}
 
-            let key = formFieldId + '_' + messagesKey,
-                message = messages[messagesKey];
-
-            if (typeof message == 'object') {
-                validatorError(formNode, messagesKey, message);
-                continue;
-            }
-
-            addError(formNode, key, message);
-        }
-    }
-
-    function addError(formNode, formFieldId, message) {
-        // let nodes = formNode.querySelectorAll('[id=' + formFieldId + '], input[type="checkbox"][id^=' + formFieldId + '], input[type="radio"][id^=' + formFieldId + ']');
-        let nodes = formNode.querySelectorAll('[id=' + formFieldId + ']');
-
+		let nodes = formNode.querySelectorAll('[id=' + formFieldId + ']');
+		const message = messages.map(m => m.message).join(' ');
         if (nodes.length) {
             let node = nodes[0];
             let errorMessageNode = formNode.querySelector('#' + node.id + '_error');

@@ -9,9 +9,9 @@ document.liveQuery('[data-toggle="ajax"], [data-ajax-load]', function () {
 
 // Form Ajax Validator
 window.loadAjaxValidatorModule = () => new Promise((resolve) => import('./component/ajaxValidator').then(({default: ajaxValidator}) => resolve(ajaxValidator)));
-document.liveQuery('form[data-ajax]', () => function (el) {
+
+document.liveQuery('form[data-ajax]', (el) => {
 	loadAjaxValidatorModule().then(() => {
-		console.log('loaded ajax form');
 
 	});
 });

@@ -2,6 +2,7 @@
 
 namespace Dakataa\Crud\Twig\Extension;
 
+use Dakataa\Crud\Attribute\Action;
 use Dakataa\Crud\DakataaCrudBundle;
 use Dakataa\Crud\EventSubscriber\CrudSubscriber;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,7 +30,8 @@ class CrudExtension extends AbstractExtension
 	{
 		return [
 			new TwigFunction('hasAction', [$this, 'hasAction']),
-			new TwigFunction('generatePath', [$this, 'generatePathForAction']),
+			new TwigFunction('generatePath', [$this, 'generatePath']),
+			new TwigFunction('generatePathByAction', [$this, 'generatePathByAction']),
 			new TwigFunction('getRoute', [$this, 'getRoute']),
 			new TwigFunction('entityPrimaryKey', [$this, 'entityPrimaryKey']),
 			new TwigFunction('controllerClass', [$this, 'getControllerClass']),
@@ -51,22 +53,33 @@ class CrudExtension extends AbstractExtension
 		);
 	}
 
-	public function getRoute(string $method, string $controllerFQCN = null)
+	public function getRoute(string $actionName, string $controllerFQCN = null)
 	{
 		$controllerFQCN ??= $this->getControllerClass();
-		$mappedRoutes = $this->crudSubscriber->getController()?->getActions();
+		$actions = $this->crudSubscriber->getController()?->getActions();
 
-		return ($mappedRoutes[$method] ?? null)?->getRoute()->getName() ?? ($controllerFQCN.'::'.$method);
+		return (array_filter($actions, fn(Action $action) => $action->getName() === $actionName)[0] ?? null)?->getRoute()->getName() ?? ($controllerFQCN.'::'.$actionName);
 	}
 
-	public function hasAction(string $method): bool
+	public function hasAction(string $actionName): bool
 	{
-		$mappedRoutes = $this->crudSubscriber->getController()?->getActions();
+		$actions = $this->crudSubscriber->getController()?->getActions();
 
-		return isset($mappedRoutes[$method]);
+		return !!count(array_filter($actions, fn(Action $action) => $action->getName() === $actionName)[0] ?? []);
 	}
 
-	public function generatePathForAction(): string
+	public function generatePathByAction(Action $action, array $parameters = null):? string
+	{
+		if(!$action->getRoute())
+			throw new Exception('Cannot generate Path for Action without Route.');
+
+		$requestAttributes = $this->requestStack->getMainRequest()->attributes;
+		$pathParameters = array_intersect_key($requestAttributes->all(), array_flip(array_filter($requestAttributes->keys(), fn(string $key) => !str_starts_with($key, '_'))));
+
+		return $this->router->generate($action->getRoute()->getName(), array_merge($pathParameters, $parameters ?? []));
+	}
+
+	public function generatePath(): string
 	{
 		$arguments = func_get_args();
 		$isClassPassed = class_exists($arguments[0]);
