@@ -14,12 +14,9 @@
         <button data-toggle="class" data-target="body" data-class="toggle-nav" data-skip="#nav" class="btn nav-toggler">
             <i></i>
         </button>
-
-        <div class="first-nav">
-            <nav>
-                <a class="logo" href="#">{{ appName|default('Admin') }}</a>
-            </nav>
-        </div>
+        <nav class="first-nav">
+            <a class="logo" href="#">{{ appName|default('Admin') }}</a>
+        </nav>
         <nav class="second-nav">
             {% if is_granted('ROLE_USER') %}
                 <div class="user dropdown">
@@ -73,9 +70,9 @@
     {% endif %}
     <div class="content">
         {#        {% include "layout/component/breadcrumb.html.twig" %} #}
-        {% if app.session.flashbag %}
+        {% if app.session.flashbag.keys|length %}
             <div class="alert-messages">
-                {% for messageType, messageList in app.session.flashbag.all() %}
+                {% for messageType, messageList in app.session.flashbag.all %}
                     <div class="alert alert-dismissible alert-{{ messageType }} d-print-none mb-2">
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-hidden="true"></button>
                         <div class="flash-notice">
@@ -85,10 +82,7 @@
                 {% endfor %}
             </div>
         {% endif %}
-
-        <div class="workspace">
-            {% block body %}{% endblock %}
-        </div>
+        {% block body %}{% endblock %}
     </div>
 </main>
 <div data-page-preloader="true" class="page-preloader">

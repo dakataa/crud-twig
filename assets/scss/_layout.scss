@@ -219,10 +219,10 @@ body {
       flex-grow: 1;
       max-width: var(--content-width);
 
+      padding: var(--gutter);
+
       > nav,
       > .alert-messages {
-        padding: 1.25rem var(--gutter) 0 var(--gutter);
-
         .breadcrumb,
         .alert {
           max-width: var(--wrap-width);
@@ -482,18 +482,11 @@ body {
 
 }
 
-.list {
-  padding: var(--gutter);
-}
-
-.edit-items {
+.edit {
   header {
     --nav-gutter: calc(((var(--content-width) - 100%) / 2));
 
-    padding: 0 var(--gutter);
-
     .title {
-      padding: var(--gutter) 0;
       margin: 0;
     }
 
@@ -572,25 +565,11 @@ body {
     }
   }
 
-  main {
-    padding: calc(var(--gutter)) var(--gutter);
-  }
-
   header,
-  main {
-    .wrap {
-      margin: auto;
-      max-width: var(--wrap-width);
-    }
-
-    .actions {
-      padding: var(--gutter) 0;
-
-      .btn {
-        min-width: 160px;
-        font-size: $btn-font-size-lg;
-      }
-    }
+  main,
+  footer {
+    max-width: var(--wrap-width);
+    margin: auto auto var(--gutter);
   }
 
 

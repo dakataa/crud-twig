@@ -5,6 +5,7 @@ namespace Dakataa\Crud\Twig\Extension;
 use Dakataa\Crud\Attribute\Action;
 use Dakataa\Crud\DakataaCrudBundle;
 use Dakataa\Crud\EventSubscriber\CrudSubscriber;
+use Dakataa\Crud\Service\ActionCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -22,7 +23,8 @@ class CrudExtension extends AbstractExtension
 		protected EntityManagerInterface $entityManager,
 		protected RouterInterface $router,
 		protected ParameterBagInterface $parameterBag,
-		protected CrudSubscriber $crudSubscriber
+		protected CrudSubscriber $crudSubscriber,
+		protected ActionCollection $actionCollection
 	) {
 	}
 
@@ -32,6 +34,7 @@ class CrudExtension extends AbstractExtension
 			new TwigFunction('hasAction', [$this, 'hasAction']),
 			new TwigFunction('generatePath', [$this, 'generatePath']),
 			new TwigFunction('generatePathByAction', [$this, 'generatePathByAction']),
+			new TwigFunction('getAction', [$this, 'getAction']),
 			new TwigFunction('getRoute', [$this, 'getRoute']),
 			new TwigFunction('entityPrimaryKey', [$this, 'entityPrimaryKey']),
 			new TwigFunction('controllerClass', [$this, 'getControllerClass']),
@@ -53,7 +56,12 @@ class CrudExtension extends AbstractExtension
 		);
 	}
 
-	public function getRoute(string $actionName, string $controllerFQCN = null)
+	public function getAction(string $entityName, string $actionName, string $namespace = null): ?Action
+	{
+		return array_filter(iterator_to_array($this->actionCollection->getAll()), fn(Action $action) => $action->entity === $entityName && $action->getName() === $actionName && (!$namespace || $action->namespace === $namespace))[0] ?? null;
+	}
+
+	public function getRoute(string $actionName, string $controllerFQCN = null): string
 	{
 		$controllerFQCN ??= $this->getControllerClass();
 		$actions = $this->crudSubscriber->getController()?->getActions();
@@ -68,13 +76,17 @@ class CrudExtension extends AbstractExtension
 		return !!count(array_filter($actions, fn(Action $action) => $action->getName() === $actionName)[0] ?? []);
 	}
 
-	public function generatePathByAction(Action $action, array $parameters = null):? string
+	public function generatePathByAction(Action $action, array $parameters = null): ?string
 	{
-		if(!$action->getRoute())
+		if (!$action->getRoute()) {
 			throw new Exception('Cannot generate Path for Action without Route.');
+		}
 
 		$requestAttributes = $this->requestStack->getMainRequest()->attributes;
-		$pathParameters = array_intersect_key($requestAttributes->all(), array_flip(array_filter($requestAttributes->keys(), fn(string $key) => !str_starts_with($key, '_'))));
+		$pathParameters = array_intersect_key(
+			$requestAttributes->all(),
+			array_flip(array_filter($requestAttributes->keys(), fn(string $key) => !str_starts_with($key, '_')))
+		);
 
 		return $this->router->generate($action->getRoute()->getName(), array_merge($pathParameters, $parameters ?? []));
 	}
@@ -92,9 +104,15 @@ class CrudExtension extends AbstractExtension
 		}
 
 		$requestAttributes = $this->requestStack->getMainRequest()->attributes;
-		$pathParameters = array_intersect_key($requestAttributes->all(), array_flip(array_filter($requestAttributes->keys(), fn(string $key) => !str_starts_with($key, '_'))));
+		$pathParameters = array_intersect_key(
+			$requestAttributes->all(),
+			array_flip(array_filter($requestAttributes->keys(), fn(string $key) => !str_starts_with($key, '_')))
+		);
 
-		return $this->router->generate($this->getRoute($method, $controllerFqcn), array_merge($pathParameters, $parameters));
+		return $this->router->generate(
+			$this->getRoute($method, $controllerFqcn),
+			array_merge($pathParameters, $parameters)
+		);
 	}
 
 	public function getControllerClass(): string

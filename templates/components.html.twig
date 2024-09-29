@@ -1,4 +1,4 @@
-{% macro List(entity, form, action = [], sort = []) %}
+{% macro ListView(entity, form, action = [], sort = []) %}
     {% set identifierField = entity.primaryColumn %}
     <div class="table-responsive">
         <table class="table table-striped table-hover table-bordered">
@@ -67,7 +67,7 @@
                                             {{ action.title|trans }}
                                         </a>
                                     {% else %}
-                                        <a data-bs-toggle="modal" href="{{ generatePath(action.name, {id: rowIdentifier}) }}" class="btn btn-sm btn-outline-secondary mb-1 ms-1">
+                                        <a href="{{ generatePath(action.name, {id: rowIdentifier}) }}" class="btn btn-sm btn-outline-secondary mb-1 ms-1">
                                             {{ action.title|trans }}
                                         </a>
                                     {% endif %}
@@ -86,4 +86,8 @@
             </tbody>
         </table>
     </div>
+{% endmacro %}
+
+{% macro AjaxListView(entityName, namespace) %}
+    <div data-ajax-load="{{ generatePathByAction(getAction(entityName, 'list', namespace)) }}"></div>
 {% endmacro %}

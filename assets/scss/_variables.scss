@@ -1,22 +1,22 @@
 // VARIABLES
-$input-btn-font-family: initial !default;
-$dropdown-dark-box-shadow: initial !default;
-$nav-link-font-size: initial !default;
-$nav-link-font-weight: initial !default;
-$card-title-color: initial !default;
-$card-subtitle-color: initial !default;
-$card-box-shadow: initial !default;
-$card-cap-color: initial !default;
-$card-height: initial !default;
-$card-color: initial !default;
-$breadcrumb-bg: initial !default;
-$breadcrumb-border-radius: initial !default;
-$nested-kbd-font-weight: initial !default; // Deprecated in v5.2.0, removing in v6
-$toast-color: initial !default;
-$pre-color: initial !default;
-$modal-content-color: initial !default;
-$modal-footer-bg: initial !default;
-$tooltip-margin: initial;
+$input-btn-font-family: inherit !default;
+$dropdown-dark-box-shadow: inherit !default;
+$nav-link-font-size: inherit !default;
+$nav-link-font-weight: inherit !default;
+$card-title-color: inherit !default;
+$card-subtitle-color: inherit !default;
+$card-box-shadow: inherit !default;
+$card-cap-color: inherit !default;
+$card-height: inherit !default;
+$card-color: inherit !default;
+$breadcrumb-bg: inherit !default;
+$breadcrumb-border-radius: inherit !default;
+$nested-kbd-font-weight: inherit !default; // Deprecated in v5.2.0, removing in v6
+$toast-color: inherit !default;
+$pre-color: inherit !default;
+$modal-content-color: inherit !default;
+$modal-footer-bg: inherit !default;
+$tooltip-margin: inherit;
 
 // stylelint-disable
 $white: #fff !default;

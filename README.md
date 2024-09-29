@@ -23,9 +23,9 @@ composer require dakataa/crud-twig
 ### Component (Twig Macros)
 Available Blocks
 
-| Component | Description                                     |
-|-----------|-------------------------------------------------|
-| GridView  | The GridView is used to display data in a grid. |
+| Component | Description                                      |
+|-----------|--------------------------------------------------|
+| ListView  | The component is used to display data in a grid. |
 
 ### How to extend or change the templates
 
