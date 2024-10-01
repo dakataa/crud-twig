@@ -1,4 +1,4 @@
-{% macro ListView(entity, form, action = [], sort = []) %}
+{% block ListView %}
     {% set identifierField = entity.primaryColumn %}
     <div class="table-responsive">
         <table class="table table-striped table-hover table-bordered">
@@ -10,7 +10,7 @@
                     </th>
                 {% endif %}
                 {% for column in entity.columns %}
-                    {% set columnHeaderBlock = column.alias ~ '_header' %}
+                    {% set columnHeaderBlock = 'listView_' ~ column.alias ~ '_header' %}
                     {% block columnHeaderBlock %}
                         <th class="text-nowrap">
                             {{- column.label|trans -}}
@@ -86,8 +86,4 @@
             </tbody>
         </table>
     </div>
-{% endmacro %}
-
-{% macro AjaxListView(entityName, namespace) %}
-    <div data-ajax-load="{{ generatePathByAction(getAction(entityName, 'list', namespace)) }}"></div>
-{% endmacro %}
+{% endblock %}

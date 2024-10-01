@@ -37,7 +37,7 @@ class TemplateProvider
 
 		$templatePath = sprintf(
 			'crud/%s/%s.html.twig',
-			$this->getTemplateDirectoryByClass($controller::class),
+			$this->getTemplateDirectoryByClass($controller->getControllerClass()),
 			$template
 		);
 

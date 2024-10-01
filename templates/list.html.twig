@@ -1,5 +1,5 @@
-{% from '@DakataaCrudTwig/components.html.twig' import ListView %}
 {% extends [getParameter('layout')|default(''), '@DakataaCrudTwig/layout/default/auto.html.twig'] %}
+{% use '@DakataaCrudTwig/components.html.twig' %}
 {% block title %}{{ (title ?? 'List')|trans }}{% endblock %}
 {% macro displayFormFieldValue(formField) %}
     {% if formField.vars.choices is defined %}
@@ -95,7 +95,7 @@
             </div>
         {% endif %}
 
-        {{ ListView(entity, form, action, sort) }}
+        {{ block('ListView') }}
 
         <div class="actions d-flex flex-row flex-wrap align-items-center mb-3">
             {% if form.batch.view.method is defined %}

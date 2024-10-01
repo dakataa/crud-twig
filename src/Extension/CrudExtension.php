@@ -58,7 +58,7 @@ class CrudExtension extends AbstractExtension
 
 	public function getAction(string $entityName, string $actionName, string $namespace = null): ?Action
 	{
-		return array_filter(iterator_to_array($this->actionCollection->getAll()), fn(Action $action) => $action->entity === $entityName && $action->getName() === $actionName && (!$namespace || $action->namespace === $namespace))[0] ?? null;
+		return array_values(array_filter(iterator_to_array($this->actionCollection->getAll()), fn(Action $action) => $action->entity === $entityName && $action->getName() === $actionName && (!$namespace || $action->namespace === $namespace)))[0] ?? null;
 	}
 
 	public function getRoute(string $actionName, string $controllerFQCN = null): string
@@ -66,7 +66,7 @@ class CrudExtension extends AbstractExtension
 		$controllerFQCN ??= $this->getControllerClass();
 		$actions = $this->crudSubscriber->getController()?->getActions();
 
-		return (array_filter($actions, fn(Action $action) => $action->getName() === $actionName)[0] ?? null)?->getRoute()->getName() ?? ($controllerFQCN.'::'.$actionName);
+		return (array_values(array_filter($actions, fn(Action $action) => $action->getName() === $actionName))[0] ?? null)?->getRoute()->getName() ?? ($controllerFQCN.'::'.$actionName);
 	}
 
 	public function hasAction(string $actionName): bool

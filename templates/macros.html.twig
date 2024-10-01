@@ -1,0 +1,3 @@
+{% macro AjaxListView(entityName, namespace) %}
+    <div data-ajax-load="{{ generatePathByAction(getAction(entityName, 'list', namespace)) }}"></div>
+{% endmacro %}
