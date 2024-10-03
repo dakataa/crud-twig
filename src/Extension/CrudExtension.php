@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -56,9 +57,24 @@ class CrudExtension extends AbstractExtension
 		);
 	}
 
-	public function getAction(string $entityName, string $actionName, string $namespace = null): ?Action
-	{
-		return array_values(array_filter(iterator_to_array($this->actionCollection->getAll()), fn(Action $action) => $action->entity === $entityName && $action->getName() === $actionName && (!$namespace || $action->namespace === $namespace)))[0] ?? null;
+	public function getAction(
+		string $entityName,
+		string $actionName,
+		string $namespace = null,
+		bool $strict = true
+	): ?Action {
+		$action = array_values(
+			array_filter(
+				iterator_to_array($this->actionCollection->getAll()),
+				fn(Action $action) => $action->entity === $entityName && $action->getName() === $actionName && (!$namespace || $action->namespace === $namespace)
+			)
+		)[0] ?? null;
+
+		if ($strict && null === $action) {
+			throw new Exception(sprintf('Action "%s" for entity "%s" not found.', $actionName, $entityName));
+		}
+
+		return $action;
 	}
 
 	public function getRoute(string $actionName, string $controllerFQCN = null): string
@@ -82,13 +98,13 @@ class CrudExtension extends AbstractExtension
 			throw new Exception('Cannot generate Path for Action without Route.');
 		}
 
-		$requestAttributes = $this->requestStack->getMainRequest()->attributes;
-		$pathParameters = array_intersect_key(
-			$requestAttributes->all(),
-			array_flip(array_filter($requestAttributes->keys(), fn(string $key) => !str_starts_with($key, '_')))
+		$routePathVariables = $this->router->getRouteCollection()->get($action->getRoute()->getName())?->compile()->getPathVariables() ?: [];
+		$currentPathParameters = array_intersect_key(
+			$this->requestStack->getMainRequest()->attributes->all(),
+			array_flip($routePathVariables)
 		);
 
-		return $this->router->generate($action->getRoute()->getName(), array_merge($pathParameters, $parameters ?? []));
+		return $this->router->generate($action->getRoute()->getName(), array_merge($currentPathParameters, $parameters ?? []));
 	}
 
 	public function generatePath(): string
@@ -103,15 +119,17 @@ class CrudExtension extends AbstractExtension
 			throw new Exception('Invalid Argument "$parameters" its should be array.');
 		}
 
-		$requestAttributes = $this->requestStack->getMainRequest()->attributes;
-		$pathParameters = array_intersect_key(
-			$requestAttributes->all(),
-			array_flip(array_filter($requestAttributes->keys(), fn(string $key) => !str_starts_with($key, '_')))
+		$routeName = $this->getRoute($method, $controllerFqcn);
+		$routePathVariables = $this->router->getRouteCollection()->get($routeName)->compile()->getPathVariables();
+
+		$currentPathParameters = array_intersect_key(
+			$this->requestStack->getMainRequest()->attributes->all(),
+			array_flip($routePathVariables)
 		);
 
 		return $this->router->generate(
-			$this->getRoute($method, $controllerFqcn),
-			array_merge($pathParameters, $parameters)
+			$routeName,
+			array_merge($currentPathParameters, $parameters)
 		);
 	}
 

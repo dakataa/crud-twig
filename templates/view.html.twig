@@ -1,4 +1,4 @@
-{% extends [getParameter('layout')|default(''), '@DakataaCrudTwig/layout/default.html.twig'] %}
+{% extends [getParameter('layout')|default(''), '@DakataaCrudTwig/layout/default/auto.html.twig'] %}
 
 {%- block title -%}View{% endblock title %}
 
@@ -8,7 +8,7 @@
             <header>
                 <div class="wrap">
                     <h2 class="title">
-                        <a href="javascript:history.back()">&larr;</a>
+                        <a href="{{ generatePath('list') }}">&larr;</a>
                         {% block body_title %}
                             {{ block('title') }}
                         {% endblock %}
