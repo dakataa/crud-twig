@@ -1,3 +1,26 @@
 {% macro AjaxListView(entityName, namespace, parameters = []) %}
-    <div data-ajax-load="{{ generatePathByAction(getAction(entityName, 'list', namespace), parameters) }}"></div>
+    {% set id = 'list-view-' ~ entityName %}
+    <div id="{{ id }}" data-ajax-load="{{ generatePathByAction(getAction(entityName, 'list', namespace), parameters) }}"></div>
+    <script type="text/javascript">
+		(() => {
+			const listView = document.querySelector('#{{ id }}');
+			listView.addEventListener('loaded', (e) => {
+				e.target.querySelectorAll('a[data-action]').forEach((element) => {
+					switch (element.dataset.action) {
+						case 'view':
+						case 'edit':
+						case 'add': {
+							element.dataset.bsToggle = 'modal';
+							break;
+						}
+						case 'sort': {
+							element.dataset.toggle = 'ajax';
+							element.dataset.target = '#' + listView.id;
+							break;
+						}
+					}
+				})
+			})
+		})();
+    </script>
 {% endmacro %}

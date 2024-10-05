@@ -183,9 +183,14 @@ export default async function fetchUrl(url, container, mode, callback, callbackE
                 }
             }
 
+			container?.dispatchEvent(new CustomEvent('loaded'));
+
             return Promise.resolve([data, contentType]);
         })
         .catch(function (error) {
+
+			container?.dispatchEvent(new CustomEvent('error'));
+
             delete request[url];
             if (callbackError) {
                 if (typeof callbackError === 'function') {
@@ -225,14 +230,11 @@ if (typeof (document) !== "undefined") {
                     isOk(el);
                 });
             })
+            .then(() => loadData())
             .then(() => {
-                return loadData();
-            })
-            .then(() => {
-                logger.info('Loaded', el.dataset.ajaxLoad);
+
             })
             .catch((error) => {
-                logger.info('error', error);
             });
     });
 
@@ -248,10 +250,8 @@ if (typeof (document) !== "undefined") {
 
             fetchUrl(el.href, el.dataset.target || null, el.dataset.mode || null, el.dataset.callback || null, el.dataset.callbackError || null, el.dataset.changeurl || false, el.dataset.method || null)
                 .then(r => {
-                    logger.log('done fetch')
                 })
                 .catch((error) => {
-                    logger.log('error', error);
                 });
 
         });
@@ -268,8 +268,6 @@ if (typeof (window) !== "undefined") {
             return;
         }
         const args = historyState.dataFetcher;
-
-        logger.debug('pop', e.state);
 
         fetchUrl(document.location.href, args.container, args.mode, args.callback, args.callbackError, false, args.method, args.data, args.headers)
             .then((data) => {

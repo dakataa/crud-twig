@@ -4,7 +4,7 @@
 
 {% block body %}
     <section class="edit">
-        {% block header %}
+        {% block body_header %}
             <header>
                 <div class="wrap">
                     <h2 class="title">
@@ -13,11 +13,12 @@
                             {{ block('title') }}
                         {% endblock %}
                     </h2>
-                    {% block navigation %}
+                    {% block body_navigation %}
                         <nav class="nav">
-                            {% block tab_navigation_tabs %}
+                            {% block body_header_navigation %}
                                 {% if hasAction('edit') %}
-                                    <a class="btn btn-outline-primary" href="{{ generatePath('edit', {id: entityPrimaryKey(object)}) }}">Edit</a>
+                                    <a class="btn btn-outline-primary"
+                                       href="{{ generatePath('edit', {id: entityPrimaryKey(object)}) }}">Edit</a>
                                 {% endif %}
                             {% endblock %}
                         </nav>
@@ -25,9 +26,8 @@
                 </div>
             </header>
         {% endblock %}
-        <main class="tabs">
-            <div class="wrap">
-                <hr/>
+        <main>
+            {% block body_content %}
                 {% for column in columns %}
                     <div class="row mb-3">
                         <div class="col-12 col-lg-4">
@@ -39,7 +39,7 @@
                     </div>
                     <hr/>
                 {% endfor %}
-            </div>
+            {% endblock %}
         </main>
     </section>
 {% endblock %}

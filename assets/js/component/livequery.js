@@ -6,7 +6,8 @@ let listeners = [],
 
 observer.observe(document, {
     childList: true,
-    subtree: true
+    subtree: true,
+	attributes: true
 });
 
 export default function ready(selector, fn) {
@@ -33,11 +34,15 @@ function observe(mutationsList) {
     if (mutationsList.length) {
         let hasMatch = false;
         mutationsList.forEach(function (mutationRecord) {
-            if (mutationRecord.type === 'childList') {
-                if (mutationRecord.target.matches(selectors) || mutationRecord.target.querySelector(selectors)) {
-                    hasMatch = true;
-                }
-            }
+			switch (mutationRecord.type) {
+				case 'attributes':
+				case 'childList': {
+					if (mutationRecord.target.matches(selectors) || mutationRecord.target.querySelector(selectors)) {
+						hasMatch = true;
+					}
+					break;
+				}
+			}
         });
 
         if (!hasMatch) {

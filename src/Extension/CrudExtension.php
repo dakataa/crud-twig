@@ -89,7 +89,7 @@ class CrudExtension extends AbstractExtension
 	{
 		$actions = $this->crudSubscriber->getController()?->getActions();
 
-		return !!count(array_filter($actions, fn(Action $action) => $action->getName() === $actionName)[0] ?? []);
+		return !empty(array_filter($actions, fn(Action $action) => $action->getName() === $actionName));
 	}
 
 	public function generatePathByAction(Action $action, array $parameters = null): ?string

@@ -17,7 +17,7 @@
                             {% if column.sortable and attribute(sort, column.field) is defined %}
                                 {% set currentSortType = attribute(sort, column.field)|default(null) %}
                                 {% set nextSortType = (currentSortType ? (currentSortType == 'ASC' ? 'DESC' : null) : 'ASC') %}
-                                <a href="{{ generatePath('list', { ...app.request.query.all, sort: (sort|default({}))|merge({(column.field): (nextSortType|default('')) }) }) }}">
+                                <a data-action="sort" href="{{ generatePath('list', { ...app.request.query.all, sort: (sort|default({}))|merge({(column.field): (nextSortType|default('')) }) }) }}">
                                     {% if (currentSortType) %}
                                         {{ (currentSortType == 'ASC' ? '&uarr;':'&darr;') }}
                                     {% else %}
@@ -63,11 +63,11 @@
                             <td class="text-end text-nowrap">
                                 {% for action in action|filter(a => a.object) %}
                                     {% if 'DELETE' in action.route.methods %}
-                                        <a href="{{ generatePath(action.name, {id: rowIdentifier}) }}" class="btn btn-sm btn-outline-danger mb-1 ms-1" data-toggle="ajax" data-method="DELETE" data-confirm="Are you sure?">
+                                        <a data-action="{{ action.name }}" data-method="DELETE" href="{{ generatePath(action.name, {id: rowIdentifier}) }}" class="btn btn-sm btn-outline-danger mb-1 ms-1" data-toggle="ajax" data-confirm="Are you sure?">
                                             {{ action.title|trans }}
                                         </a>
                                     {% else %}
-                                        <a href="{{ generatePath(action.name, {id: rowIdentifier}) }}" class="btn btn-sm btn-outline-secondary mb-1 ms-1">
+                                        <a data-action="{{ action.name }}" href="{{ generatePath(action.name, {id: rowIdentifier}) }}" class="btn btn-sm btn-outline-secondary mb-1 ms-1">
                                             {{ action.title|trans }}
                                         </a>
                                     {% endif %}

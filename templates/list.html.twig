@@ -47,7 +47,7 @@
                 <div class="d-flex align-items-center">
                     <div class="btn-group btn-group-sm me-2">
                         {% for action in action|filter(a => false == a.object) %}
-                            <a href="{{ generatePathByAction(action) }}" class="btn btn-outline-secondary">
+                            <a href="{{ generatePathByAction(action) }}" data-action="{{ action.name }}" class="btn btn-outline-secondary">
                                 {{ action.title|trans }}
                             </a>
                         {% endfor %}
