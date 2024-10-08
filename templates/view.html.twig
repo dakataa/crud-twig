@@ -17,7 +17,7 @@
                         <nav class="nav">
                             {% block body_header_navigation %}
                                 {% if hasAction('edit') %}
-                                    <a class="btn btn-outline-primary"
+                                    <a data-action="edit" class="btn btn-outline-primary"
                                        href="{{ generatePath('edit', {id: entityPrimaryKey(object)}) }}">Edit</a>
                                 {% endif %}
                             {% endblock %}

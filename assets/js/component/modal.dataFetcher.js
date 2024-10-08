@@ -9,7 +9,7 @@ class ModalDataFetcher {
         this.dataFetcher = dataFetcher;
     }
 
-    load(target, settings) {
+    load(target, settings, relatedTargetElement) {
         if (!target) {
             return;
         }
@@ -54,6 +54,7 @@ class ModalDataFetcher {
                 preloader.classList.add('active')
                 preloader.hidden = false;
             }
+
             this.dataFetcher(target, null, null, null, null, false, settings.method || null, null, [
                 {
                     name: 'modal-dialog',
@@ -65,10 +66,6 @@ class ModalDataFetcher {
                 }
 
                 document.querySelectorAll('.modal.show').forEach((el) => {
-                    // if (settings.reopenParent) {
-                    //     el.dispatchEvent(new Event('addParent'));
-                    // }
-
                     let modalInstance = this.modal.getInstance(el);
                     if (modalInstance) {
                         el.manuallyClosed = true;
@@ -110,11 +107,13 @@ class ModalDataFetcher {
                         modalInstance.hide();
                     }
                 }
+
                 modalElement.addEventListener('addParent', (e) => {
                     if(modalElement.data) {
                         ModalDataFetcher.modalBreadcrumb.push(modalElement.data);
                     }
-                })
+                });
+
                 modalElement.addEventListener('show.bs.modal', (e) => {
                     // Change current url
                     if (settings.changeUrl !== undefined && settings.changeUrl) {
@@ -127,6 +126,8 @@ class ModalDataFetcher {
                         // Add new state for new modal with variable modal to true
                         window.history.pushState(state, '', target);
                     }
+
+					relatedTargetElement?.dispatchEvent(new CustomEvent('show.ajax.modal', { detail: { target: modalElement }}))
                 });
 
                 modalElement.addEventListener('hide.bs.modal', (e) => {
@@ -137,7 +138,7 @@ class ModalDataFetcher {
                         window.history.replaceState(Object.assign({modal: false}, initState.state || {}), '', initState.url || document.location.href.split('#')[0]);
                     }
 
-                    //Open Modal with new Url on close event
+                    //Open Modal with new Url on ``close`` event
                     if (settings.oncloseOpen) {
                         let nextUrl = settings.oncloseOpen;
                         delete settings.oncloseOpen;
@@ -153,10 +154,14 @@ class ModalDataFetcher {
                         ModalDataFetcher.modalBreadcrumb.splice(-1, 1);
                     }
                     e.target.remove();
-                })
+
+					relatedTargetElement?.dispatchEvent(new CustomEvent('hide.ajax.modal', { detail: { target: modalElement }}))
+                });
+
                 if (settings.class !== undefined) {
                     modalElement.classList.add(settings.class);
                 }
+
                 modalInstance.show();
             }).catch((error) => {
                 console.log('error', error);

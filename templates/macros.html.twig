@@ -3,14 +3,27 @@
     <div id="{{ id }}" data-ajax-load="{{ generatePathByAction(getAction(entityName, 'list', namespace), parameters) }}"></div>
     <script type="text/javascript">
 		(() => {
-			const listView = document.querySelector('#{{ id }}');
-			listView.addEventListener('loaded', (e) => {
-				e.target.querySelectorAll('a[data-action]').forEach((element) => {
+			window.addEventListener('load', () => {
+				document.liveQuery('.modal', (el) => {
+					updateActions(el);
+					el.querySelectorAll('form[data-ajax]').forEach((formEl) => {
+						formEl.addEventListener('success', (e) => {
+							e.preventDefault();
+
+							window.closeModal();
+							listView.dispatchEvent(new CustomEvent('reload'));
+						});
+					})
+                });
+			});
+
+            const updateActions = (target) => {
+				target.querySelectorAll('a[data-action]').forEach((element) => {
 					switch (element.dataset.action) {
 						case 'view':
 						case 'edit':
 						case 'add': {
-							element.dataset.bsToggle = 'modal';
+							element.dataset.toggle = 'modal';
 							break;
 						}
 						case 'sort': {
@@ -19,8 +32,12 @@
 							break;
 						}
 					}
-				})
-			})
+				});
+            };
+
+			const listView = document.querySelector('#{{ id }}');
+			listView.addEventListener('loaded', (e) => updateActions(e.target));
+
 		})();
     </script>
 {% endmacro %}

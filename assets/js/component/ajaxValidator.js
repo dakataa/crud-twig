@@ -62,12 +62,10 @@ import Requester, {RequestBodyType} from "@dakataa/requester";
 			response = r;
 			return r.getData()
 		}).then((data) => {
-			console.log('response', data);
 			switch (response.getHeaders().get('content-type')) {
 				case 'application/json': {
 					// Clear previous errors
 					clearValidatorErrors();
-
 
 					const processForm = (formNode, formView, options) => {
 						let action = formNode.action || location.href;
@@ -111,21 +109,21 @@ import Requester, {RequestBodyType} from "@dakataa/requester";
 							delete formNode.dataset.submitted;
 						} else {
 							let objectData = (formView.data || formView);
-							if (!options.callback) {
-								if (options.refresh === true || options.submit === true) {
-									if (action && options.submit === true) {
-										document.onsubmit = null;
-										formNode.submit();
-									} else if (options.refresh) {
-										location.reload();
-									}
-								}
-							} else if (window[options.callback] !== undefined) {
-								window[options.callback].call(this, objectData);
-							}
 
 							try {
-								formNode.dispatchEvent(new CustomEvent('success', {detail: objectData}));
+								const isSuccess = formNode.dispatchEvent(new CustomEvent('success', {
+									detail: objectData,
+									cancelable: true
+								}));
+
+								if(isSuccess) {
+									if (data.redirect.url !== undefined) {
+										return document.location.href = data.redirect.url
+									}
+
+									document.onsubmit = null;
+									formNode.submit();
+								}
 							} catch (e) {
 								console.log('Error in event listener callback');
 							}

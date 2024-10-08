@@ -84,8 +84,7 @@ export default async function fetchUrl(url, container, mode, callback, callbackE
 		redirected = false;
 
 
-    return await fetch(url,
-        {
+    return await fetch(url,{
             method: method,
             headers: allHeader,
             body: data || null,

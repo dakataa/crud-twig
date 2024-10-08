@@ -1,71 +1,64 @@
 'use strict';
 
-let listeners = [],
-    MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
-    observer = new MutationObserver(observe);
+const MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+const observeSelectors = {};
+const observeSelectorCallbacks = {};
 
-observer.observe(document, {
-    childList: true,
-    subtree: true,
-	attributes: true
-});
 
-export default function ready(selector, fn) {
-    let listener = {
-        selector: selector,
-        fn: fn
-    };
-    // Store the selector and callback to be monitored
-    listeners.push(listener);
-    // Check if the element is currently in the DOM
-    updateListeners([listener]);
-}
+export default function liveQuery(selector, callback) {
+	const target = this;
 
-function observe(mutationsList) {
-    mutationsList = mutationsList || [];
-    let selectors = (listeners || []).map(function (e) {
-        return e.selector;
-    }).join(',')
+	const triggerCallbacks = (target) => {
+		(observeSelectors[target] || []).forEach((selector) => {
+			const callback = observeSelectorCallbacks[target][selector];
 
-    if (!selectors.length) {
-        return;
-    }
+			target.querySelectorAll(selector).forEach((element) => {
+				if ((element.liveQueryReady || []).includes(selector) === false) {
+					element.liveQueryReady = element.liveQueryReady || [];
+					element.liveQueryReady.push(selector);
 
-    if (mutationsList.length) {
-        let hasMatch = false;
-        mutationsList.forEach(function (mutationRecord) {
+					// Invoke the callback with the element
+					callback.call(element, element);
+				}
+			});
+		})
+	}
+	const observer = new MutationObserver((mutationsList) => {
+		if(observeSelectors[target] === undefined) {
+			return;
+		}
+
+		const selectors = observeSelectors[target].join(',');
+		let hasMatch = false;
+		mutationsList.forEach(function (mutationRecord) {
 			switch (mutationRecord.type) {
 				case 'attributes':
 				case 'childList': {
-					if (mutationRecord.target.matches(selectors) || mutationRecord.target.querySelector(selectors)) {
-						hasMatch = true;
-					}
+					hasMatch = mutationRecord.target.matches(selectors) || mutationRecord.target.querySelector(selectors);
 					break;
 				}
 			}
-        });
+		});
 
-        if (!hasMatch) {
-            return;
-        }
-    }
+		if(!hasMatch) {
+			return;
+		}
 
-    updateListeners(listeners);
+		triggerCallbacks(target);
+	});
+
+	if(observeSelectors[target] === undefined) {
+		observer.observe(target, {
+			childList: true,
+			subtree: true,
+			attributes: true
+		});
+	}
+
+	observeSelectors[target] = [...(observeSelectors[target] || []), selector].filter((value, index, array) => array.indexOf(value) === index);
+	observeSelectorCallbacks[target] = {...(observeSelectorCallbacks[target] || {}), [selector]: callback};
+
+	triggerCallbacks(target);
 }
 
-function updateListeners(list) {
-    // Check the DOM for elements matching a stored selector
-    (list || []).forEach(function (listener) {
-        // Query for elements matching the specified selector
-        document.querySelectorAll(listener.selector).forEach(function (element) {
-            if ((element.ready || []).indexOf(listener.selector) === -1) {
-                element.ready = element.ready || [];
-                element.ready.push(listener.selector);
-                // Invoke the callback with the element
-                listener.fn.call(element, element);
-            }
-        });
-    });
-}
-
-Node.prototype.liveQuery = ready;
+Node.prototype.liveQuery = liveQuery;

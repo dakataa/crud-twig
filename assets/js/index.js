@@ -49,7 +49,7 @@ document.liveQuery('[data-bs-toggle="dropdown"]', (el) => loadDropdownModule().t
 // Bootstrap Modal
 window.loadModalModule = () => new Promise((resolve) => import("bootstrap/js/src/modal").then(({default: modal}) => resolve(modal)));
 window.loadModalDataFetcherModule = () => new Promise((resolve) => import('./component/modal.dataFetcher').then(({default: dataFetcher}) => resolve(dataFetcher)));
-document.liveQuery('[data-bs-toggle="modal"]', function (el) {
+document.liveQuery('[data-toggle="modal"]', function (el) {
 	el.addEventListener('click', (e) => {
 		e.preventDefault();
 
@@ -57,7 +57,7 @@ document.liveQuery('[data-bs-toggle="modal"]', function (el) {
 			.then(modal => {
 				return loadDataFetcherModule().then(dataFetcher => {
 					return loadModalDataFetcherModule().then(modalDataFetcher => {
-						return new modalDataFetcher(modal, dataFetcher).load(el.dataset.target || el.getAttribute('href') || null, el.dataset || {});
+						return new modalDataFetcher(modal, dataFetcher).load(el.dataset.target || el.getAttribute('href') || null, el.dataset || {}, el);
 					});
 				});
 			});
