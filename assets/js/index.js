@@ -1,14 +1,81 @@
 import './component/livequery';
+import {checkElementVisibility} from "./utils";
+
+// Alert
+window.loadAlertModule = () => new Promise((resolve) => import('./component/alert').then(({default: alert}) => resolve(alert)));
 
 // Data Fetcher
 window.loadDataFetcherModule = () => new Promise((resolve) => import('./component/dataFetcher').then(({default: dataFetcher}) => resolve(dataFetcher)));
-document.liveQuery('[data-toggle="ajax"], [data-ajax-load]', function () {
-	window.loadDataFetcherModule().then(() => {
+
+document.liveQuery('[data-ajax-load]', function (el) {
+	window.loadDataFetcherModule().then((dataFetcher) => {
+		console.log('load dataFetcher');
+		const loadData = () => {
+			console.log('load', el.dataset.ajaxLoad);
+			return dataFetcher(el.dataset.ajaxLoad, el, el.dataset.mode, el.dataset.callback, el.dataset.callbackError, el.dataset.changeUrl, el.dataset.method);
+		}
+
+		el.addEventListener('reload', loadData);
+
+		checkElementVisibility(el)
+			.then(() => new Promise((resolve, reject) => {
+					const isOk = element => {
+						if (element.dataset.ajaxLoad.search(/\w:\w/gi) === -1) {
+							resolve();
+							return;
+						}
+
+						setTimeout(() => isOk(element), 100);
+					}
+
+					isOk(el);
+			}))
+			.then(loadData)
+			.catch((error) => {
+				console.log('error', error);
+			});
+
+	});
+});
+
+document.liveQuery('[data-toggle="ajax"]', function (el) {
+	window.loadDataFetcherModule().then((dataFetcher) => {
+		el.addEventListener('click', function (e) {
+			e.preventDefault();
+
+			const update = () => {
+				fetchUrl(el.href, el.dataset.target || null, el.dataset.mode || null, el.dataset.callback || null, el.dataset.callbackError || null, el.dataset.changeurl || false, el.dataset.method || null)
+					.then(r => {
+						console.log('resolve', r);
+					})
+					.catch((error) => {
+						console.log('resolve', error);
+					});
+			}
+
+			if (this.dataset.confirm) {
+				window
+					.loadAlertModule()
+					.then((Alert) => new Alert({
+						title: el.dataset.confirm
+					}))
+					.then((confirmed) => {
+						console.log(confirmed);
+						if (confirmed) {
+							update();
+						}
+					})
+
+			} else {
+
+			}
+
+		});
 	});
 });
 
 // Form Ajax Validator
-window.loadAjaxValidatorModule = () => new Promise((resolve) => import('./component/ajaxValidator').then(({default: ajaxValidator}) => resolve(ajaxValidator)));
+window.loadAjaxValidatorModule = () => new Promise((resolve) => import('./component/formValidator').then(({default: ajaxValidator}) => resolve(ajaxValidator)));
 
 document.liveQuery('form[data-ajax]', (el) => {
 	loadAjaxValidatorModule().then(() => {

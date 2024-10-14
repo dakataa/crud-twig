@@ -1,7 +1,6 @@
 'use strict';
 
 import logger from "./logger";
-import {checkElementVisibility} from '../utils/index'
 
 let queue = {},
     request = {};
@@ -203,59 +202,6 @@ export default async function fetchUrl(url, container, mode, callback, callbackE
         });
 
 };
-
-if (typeof (document) !== "undefined") {
-    // Load content with ajax on load
-    document.liveQuery('[data-ajax-load]', (el) => {
-
-        const loadData = () => {
-            return fetchUrl(el.dataset.ajaxLoad, el, el.dataset.mode, el.dataset.callback, el.dataset.callbackError, el.dataset.changeUrl, el.dataset.method);
-        }
-
-        el.addEventListener('reload', loadData);
-
-        checkElementVisibility(el)
-            .then(() => {
-                return new Promise((resolve, reject) => {
-                    const isOk = element => {
-                        if (element.dataset.ajaxLoad.search(/\w:\w/gi) === -1) {
-                            resolve();
-                            return;
-                        }
-
-                        setTimeout(() => isOk(element), 100);
-                    }
-
-                    isOk(el);
-                });
-            })
-            .then(() => loadData())
-            .then(() => {
-
-            })
-            .catch((error) => {
-            });
-    });
-
-    document.liveQuery('[data-toggle="ajax"]', (el) => {
-        el.addEventListener('click', function (e) {
-            e.preventDefault();
-
-            if (this.dataset.confirm) {
-                if (!confirm(el.dataset.confirm)) {
-                    return false;
-                }
-            }
-
-            fetchUrl(el.href, el.dataset.target || null, el.dataset.mode || null, el.dataset.callback || null, el.dataset.callbackError || null, el.dataset.changeurl || false, el.dataset.method || null)
-                .then(r => {
-                })
-                .catch((error) => {
-                });
-
-        });
-    });
-}
 
 if (typeof (window) !== "undefined") {
     window.fetchUrl = fetchUrl;

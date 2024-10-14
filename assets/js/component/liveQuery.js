@@ -4,7 +4,6 @@ const MutationObserver = window.MutationObserver || window.WebKitMutationObserve
 const observeSelectors = {};
 const observeSelectorCallbacks = {};
 
-
 export default function liveQuery(selector, callback) {
 	const target = this;
 
