@@ -1,0 +1,21 @@
+.modal-alert {
+  --animation-transform: null;
+  --animation-transition: all .3s ease-out;
+
+  transition: var(--animation-transition);
+  transform: var(--animation-transform);
+
+  &.fade {
+    --animation-transform: translate(0, -50px);
+  }
+
+  &.scale {
+    --animation-transform: scale(.8);
+  }
+
+
+  &.show {
+    --animation-transform: none;
+  }
+
+}

@@ -2,7 +2,7 @@ import './component/livequery';
 import {checkElementVisibility} from "./utils";
 
 // Alert
-window.loadAlertModule = () => new Promise((resolve) => import('./component/alert').then(({default: alert}) => resolve(alert)));
+window.loadAlertModule = () => new Promise((resolve) => import('./component/alert/alert').then(({default: alert}) => resolve(alert)));
 
 // Data Fetcher
 window.loadDataFetcherModule = () => new Promise((resolve) => import('./component/dataFetcher').then(({default: dataFetcher}) => resolve(dataFetcher)));
@@ -58,7 +58,7 @@ document.liveQuery('[data-toggle="ajax"]', function (el) {
 					.loadAlertModule()
 					.then((Alert) => new Alert({
 						title: el.dataset.confirm
-					}))
+					}).show())
 					.then((confirmed) => {
 						console.log(confirmed);
 						if (confirmed) {
