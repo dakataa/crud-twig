@@ -26,6 +26,10 @@
 							element.dataset.toggle = 'modal';
 							break;
 						}
+						case 'delete': {
+							element.dataset.target = '#' + listView.id;
+							break;
+						}
 						case 'sort': {
 							element.dataset.toggle = 'ajax';
 							element.dataset.target = '#' + listView.id;

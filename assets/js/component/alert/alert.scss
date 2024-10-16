@@ -1,16 +1,22 @@
 .modal-alert {
   --animation-transform: null;
   --animation-transition: all .3s ease-out;
+  --animation-keyframes: animation-open-default;
+  --animation-keyframes-duration: .3s;
+  --modal-alert-vertical-gutter: 1.5rem;
+  --modal-alert-icon-size: 92px;
 
   transition: var(--animation-transition);
   transform: var(--animation-transform);
 
   &.fade {
-    --animation-transform: translate(0, -50px);
+    animation: animation-open-fade;
   }
 
-  &.scale {
-    --animation-transform: scale(.8);
+  &.scale,
+  &.bounce,
+  &.default {
+    animation: var(--animation-keyframes) var(--animation-keyframes-duration);
   }
 
 
@@ -18,4 +24,41 @@
     --animation-transform: none;
   }
 
+  .modal-alert-icon {
+    width: var(--modal-alert-icon-size);
+    height: var(--modal-alert-icon-size);
+    margin-bottom: var(--modal-alert-vertical-gutter);
+  }
+
+  .modal-alert-title,
+  .modal-alert-text {
+    margin-bottom: var(--modal-alert-vertical-gutter);
+  }
+}
+
+@keyframes animation-open-default {
+  0% {
+    transform: scale(0.7);
+  }
+
+  45% {
+    transform: scale(1.05);
+  }
+
+  80% {
+    transform: scale(0.95);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes animation-open-fade {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }

@@ -1,5 +1,6 @@
 import './component/livequery';
 import {checkElementVisibility} from "./utils";
+import {Animation, Icon, Size} from "./component/alert/alert";
 
 // Alert
 window.loadAlertModule = () => new Promise((resolve) => import('./component/alert/alert').then(({default: alert}) => resolve(alert)));
@@ -19,16 +20,16 @@ document.liveQuery('[data-ajax-load]', function (el) {
 
 		checkElementVisibility(el)
 			.then(() => new Promise((resolve, reject) => {
-					const isOk = element => {
-						if (element.dataset.ajaxLoad.search(/\w:\w/gi) === -1) {
-							resolve();
-							return;
-						}
-
-						setTimeout(() => isOk(element), 100);
+				const isOk = element => {
+					if (element.dataset.ajaxLoad.search(/\w:\w/gi) === -1) {
+						resolve();
+						return;
 					}
 
-					isOk(el);
+					setTimeout(() => isOk(element), 100);
+				}
+
+				isOk(el);
 			}))
 			.then(loadData)
 			.catch((error) => {
@@ -43,33 +44,38 @@ document.liveQuery('[data-toggle="ajax"]', function (el) {
 		el.addEventListener('click', function (e) {
 			e.preventDefault();
 
-			const update = () => {
-				fetchUrl(el.href, el.dataset.target || null, el.dataset.mode || null, el.dataset.callback || null, el.dataset.callbackError || null, el.dataset.changeurl || false, el.dataset.method || null)
-					.then(r => {
-						console.log('resolve', r);
-					})
-					.catch((error) => {
-						console.log('resolve', error);
-					});
-			}
+			const update = () => fetchUrl(
+				el.href, el.dataset.target || null,
+				el.dataset.mode || null,
+				el.dataset.callback || null,
+				el.dataset.callbackError || null,
+				el.dataset.changeurl || false,
+				el.dataset.method || null
+			);
 
 			if (this.dataset.confirm) {
 				window
 					.loadAlertModule()
 					.then((Alert) => new Alert({
-						title: el.dataset.confirm
-					}).show())
-					.then((confirmed) => {
-						console.log(confirmed);
-						if (confirmed) {
-							update();
+						title: 'Confirm',
+						text: 'Do you want to delete this item?',
+						animation: Animation.scale,
+						icon: Icon.info,
+						size: Size.default,
+						actions: {
+							cancel: {
+								label: 'Cancel',
+								classList: ['btn-outline-primary']
+							},
+							confirm: {
+								label: 'Confirm',
+							}
 						}
-					})
-
+					}).show())
+					.then(update)
 			} else {
-
+				update();
 			}
-
 		});
 	});
 });

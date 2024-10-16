@@ -1,16 +1,25 @@
 import './alert.scss';
+import modal from 'bootstrap/js/src/modal';
 
 const Animation = {
 	scale: 'scale',
-	fade: 'fade',
+	fade: 'fade'
 };
 
 const Icon = {
-	success: 'Success',
-	denied: 'Denied',
-	alert: 'Alert',
-	confirm: 'Confirm'
+	success: import('./assets/icons/success.json'),
+	denied: import('./assets/icons/denied.json'),
+	warning: import('./assets/icons/warning.json'),
+	info: import('./assets/icons/info.json'),
+	confirm: import('./assets/icons/info.json')
 };
+
+const Size = {
+	small: 'modal-sm',
+	default: '',
+	large: 'modal-lg',
+	extraLarge: 'modal-xl'
+}
 
 class Alert {
 
@@ -19,28 +28,27 @@ class Alert {
 	options = {
 		title: 'Are you confirm?',
 		text: null,
-		icon: Icon.alert,
+		icon: Icon.success,
 		animation: Animation.scale,
+		size: Size.small,
 		actions: {
 			confirm: {
 				label: 'OK',
-				classList: []
+				classList: [
+					'btn-primary'
+				]
 			},
 			cancel: {
-				label: 'Cancel'
+				label: 'Cancel',
+				classList: [
+					'btn-outline-secondary'
+				]
 			}
 		},
-		allowClose: false,
-		template: `
-		  <div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-			  <div class="modal-body d-flex flex-column align-items-center">
-			  </div>
-			</div>
-		  </div>`
+		allowClose: false
 	};
 
-	construct(options) {
+	constructor(options) {
 		this.options = {
 			...this.options,
 			...(options || {})
@@ -54,78 +62,114 @@ class Alert {
 	show() {
 		this.hide();
 
-		const modalElement = document.createElement('div');
-		modalElement.innerHTML = this.options.template;
-		modalElement.classList.add(...['modal', 'modal-alert', this.options.animation].filter(v => v));
-		modalElement.addEventListener('hidden.bs.modal', () => {
-			this.modalInstance.dispose();
-			this.modalInstance = null;
-		})
-
 		return new Promise((resolve, reject) => {
-			import("bootstrap/js/src/modal").then(({default: modal}) => {
-				document.body.append(modalElement);
-				this.modalInstance = modal.getOrCreateInstance(modalElement, {
-					backdrop: 'static'
-				});
+			const modalElement = document.createElement('div');
+			modalElement.classList.add(...['modal', 'modal-alert', this.options.animation].filter(v => v));
+			modalElement.addEventListener('hidden.bs.modal', () => {
+				this.modalInstance.dispose();
+				this.modalInstance = null;
+				modalElement.remove();
+			})
 
-				if (this.options.allowClose) {
-					modalElement.addEventListener('hidePrevented.bs.modal', (e) => {
-						this.modalInstance.hide();
-						reject();
-					});
-				}
+			const modalDialogElement = document.createElement('div');
+			modalDialogElement.classList.add(...['modal-dialog', 'modal-dialog-centered', this.options.size].filter(v => v));
+			modalElement.append(modalDialogElement);
 
-				const modalBody = modalElement.querySelector('.modal-body');
-				const titleElement = document.createElement('h5');
-				titleElement.textContent = this.options.title;
-				titleElement.classList.add(...['modal-title']);
-				modalBody.append(titleElement);
+			const modalContentElement = document.createElement('div');
+			modalContentElement.classList.add(...['modal-content']);
+			modalDialogElement.append(modalContentElement);
 
-				if (this.options.text) {
-					const textElement = document.createElement('p');
-					textElement.textContent = this.options.text;
-					modalBody.append(textElement);
-				}
+			const modalBodyElement = document.createElement('div');
+			modalBodyElement.classList.add(...['modal-body', 'd-flex', 'flex-column', 'align-items-center']);
+			modalContentElement.append(modalBodyElement);
 
-				if (Object.keys(this.options.actions).length) {
-					const actionsElement = document.createElement('div');
-					actionsElement.classList.add(...['d-flex', 'flex-row', 'align-items']);
-					modalBody.append(actionsElement);
-
-					Object.keys(this.options.actions).forEach((action) => {
-						const {
-							label,
-							classList
-						} = this.options.actions[action];
-						const actionButtonElement = document.createElement('a');
-						actionButtonElement.classList.add(...['mx-2', 'btn', ...(classList || ['btn-default'])]);
-						actionButtonElement.textContent = label || action.toString();
-						actionButtonElement.addEventListener('click', () => {
-							switch (action) {
-								case 'cancel': {
-									reject()
-									break;
-								}
-								default: {
-									resolve({
-										action,
-										isConfirmed: action === 'confirm'
-									})
-								}
-							}
-
-							this.modalInstance.hide();
-						});
-						actionsElement.append(actionButtonElement);
-					});
-				}
-
-				this.modalInstance.show();
+			document.body.append(modalElement);
+			this.modalInstance = modal.getOrCreateInstance(modalElement, {
+				backdrop: 'static'
 			});
-		})
+
+			if (this.options.allowClose) {
+				modalElement.addEventListener('hidePrevented.bs.modal', (e) => {
+					this.modalInstance.hide();
+					reject();
+				});
+			}
+
+			const iconElement = document.createElement('div');
+			iconElement.classList.add(...['modal-alert-icon']);
+			modalBodyElement.append(iconElement);
+
+			if (this.options.icon) {
+				import('lottie-web').then(({default: lottiePlayer}) => {
+
+					const loadAnimation = (options) => lottiePlayer.loadAnimation({
+						container: iconElement,
+						renderer: 'svg',
+						loop: false,
+						autoplay: true,
+						...(options || {}),
+						rendererSettings: {
+							preserveAspectRatio: 'xMidYMid meet'
+						}
+					});
+
+					if (this.options.icon instanceof Promise) {
+						this.options.icon.then((data) => loadAnimation({animationData: data}));
+					} else {
+						loadAnimation({path: this.options.icon});
+					}
+				});
+			}
+
+			const titleElement = document.createElement('h3');
+			titleElement.textContent = this.options.title;
+			titleElement.classList.add(...['modal-alert-title']);
+			modalBodyElement.append(titleElement);
+
+			if (this.options.text) {
+				const textElement = document.createElement('p');
+				textElement.classList.add(...['modal-alert-text']);
+				textElement.textContent = this.options.text;
+				modalBodyElement.append(textElement);
+			}
+
+			if (Object.keys(this.options.actions).length) {
+				const actionsElement = document.createElement('div');
+				actionsElement.classList.add(...['d-flex', 'flex-row', 'align-items']);
+				modalBodyElement.append(actionsElement);
+
+				Object.keys(this.options.actions).forEach((action) => {
+					const {
+						label,
+						classList
+					} = this.options.actions[action];
+					const actionButtonElement = document.createElement('a');
+					actionButtonElement.classList.add(...['btn', 'mx-2', ...(classList || ['btn-primary'])]);
+					actionButtonElement.textContent = label || action.toString();
+					actionButtonElement.addEventListener('click', () => {
+						switch (action) {
+							case 'cancel': {
+								reject()
+								break;
+							}
+							default: {
+								resolve({
+									action,
+									isConfirmed: action === 'confirm'
+								})
+							}
+						}
+
+						this.modalInstance.hide();
+					});
+					actionsElement.append(actionButtonElement);
+				});
+			}
+
+			this.modalInstance.show();
+		});
 	}
 }
 
 
-export {Animation, Alert as default};
+export {Animation, Icon, Size, Alert as default};
