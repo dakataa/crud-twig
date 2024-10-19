@@ -1,16 +1,19 @@
 'use strict';
 
 import logger from "./logger";
+import Requester, {RequestBodyType} from "@dakataa/requester";
+
+Requester.defaults = {
+	baseURL: document.location.href
+};
 
 let queue = {},
 	request = {};
 
-const methods = ['get', 'post', 'patch', 'delete'];
-export default async function fetchUrl(url, container, mode, callback, callbackError, changeUrl, method, data, headers) {
+export default async function fetchUrl(url, container, mode, callback, callbackError, changeUrl, method, requestData, headers) {
 	headers = headers || [];
-	data = data || null;
-	method = (method || 'get').toLowerCase();
-	method = methods.indexOf(method) !== -1 ? method : methods[0];
+	requestData = requestData || null;
+	method = (method || 'get').toUpperCase();
 	changeUrl = (changeUrl === true || changeUrl === 'true');
 	container = container ? container instanceof Node ? container : document.querySelector(container) : null;
 
@@ -36,7 +39,7 @@ export default async function fetchUrl(url, container, mode, callback, callbackE
 		callbackError: callbackError,
 		changeUrl: changeUrl,
 		method: method,
-		data: data,
+		data: requestData,
 		headers: headers,
 	};
 
@@ -72,37 +75,32 @@ export default async function fetchUrl(url, container, mode, callback, callbackE
 		allHeader[header.name] = header.value;
 	})
 
-	if (typeof data === "object") {
-		data = new URLSearchParams(data || '').toString();
-	}
-
 	request[url] = new AbortController();
 	let contentType = null,
 		status = 0,
 		json = false,
 		redirected = false;
 
-
-	return await fetch(url, {
-		method: method,
-		headers: allHeader,
-		body: data || null,
-		signal: request[url].signal
-	})
-		.then(function (response) {
+	let response = null;
+	return (new Requester({
+		headers: allHeader
+	})).fetch({
+		url,
+		method,
+		body: ['POST', 'PUT'].includes(method) ? requestData : null,
+		query: ['GET'].includes(method) ? requestData : null,
+		signal: request[url]?.signal}).then((r) => {
+		response = r;
+		return r.getData()
+	}).then((data) => {
 			delete request[url];
 
 			status = response.status;
 			redirected = response.redirected ? response.url : false;
-			contentType = (response.headers.get('content-type') || 'text/html').split(';').shift();
-			switch (contentType) {
-				case 'application/json': {
-					json = true;
-					return response.json();
-				}
-			}
+			contentType = (response.getHeaders().get('content-type') || 'text/html').split(';').shift();
+			json = contentType === 'application/json';
 
-			return response.text();
+			return data;
 		})
 		.then(function (data) {
 			if (typeof (document) !== "undefined") {
@@ -115,7 +113,6 @@ export default async function fetchUrl(url, container, mode, callback, callbackE
 			// Delete from queue
 			delete queue[url];
 
-			console.log(status, container, data);
 			switch (status) {
 				case 200: {
 					if (container && !json) {

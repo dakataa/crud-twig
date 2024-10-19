@@ -23,7 +23,7 @@
                 <small class="mb-2">{{ (formField.vars.label ?? formField.vars.name)|capitalize|trans }}</small>
                 <div class="btn btn-sm btn-primary me-1 mb-1">
                     {{ _self.displayFormFieldValue(formField) }}
-                    <a href="{{ generatePath('list', { filter: filterVars }) }}" class="text-white">
+                    <a data-action="list" href="{{ generatePath('list', { filter: filterVars }) }}" class="text-white">
                         &times;
                     </a>
                 </div>
@@ -77,7 +77,7 @@
                                 </div>
                             </div>
                             {% if hasFilters %}
-                                <a href="{{ generatePath('list', { filter: '' }) }}" class="btn btn-outline-dark">x</a>
+                                <a href="{{ generatePath('list', { filter: '' }) }}" data-action="list" class="btn btn-outline-dark">x</a>
                             {% endif %}
                         </div>
                     {% endif %}

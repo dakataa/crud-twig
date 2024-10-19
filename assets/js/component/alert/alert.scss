@@ -1,8 +1,9 @@
 .modal-alert {
   --animation-transform: null;
-  --animation-transition: all .3s ease-out;
+  --animation-transition: null;
   --animation-keyframes: animation-open-default;
   --animation-keyframes-duration: .3s;
+  --animation-timeout-progress: 1s;
   --modal-alert-vertical-gutter: 1.5rem;
   --modal-alert-icon-size: 92px;
 
@@ -16,12 +17,23 @@
   &.scale,
   &.bounce,
   &.default {
-    animation: var(--animation-keyframes) var(--animation-keyframes-duration);
+    animation: var(--animation-keyframes) var(--animation-keyframes-duration) ease-in-out;
   }
 
 
   &.show {
     --animation-transform: none;
+  }
+
+  &.close {
+    animation-direction: reverse;
+    animation-duration: calc(var(--animation-keyframes-duration) / 2);
+  }
+
+  .btn-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
   }
 
   .modal-alert-icon {
@@ -34,11 +46,31 @@
   .modal-alert-text {
     margin-bottom: var(--modal-alert-vertical-gutter);
   }
+
+  .modal-alert-progress {
+    background: var(--bs-primary);
+    animation: animation-progress var(--animation-timeout-progress) linear;
+    height: .25rem;
+    position: absolute;
+    bottom: 0;
+  }
 }
+
+@keyframes animation-progress {
+  0% {
+    width: 100%;
+  }
+
+  100% {
+    width: 0%;
+  }
+}
+
 
 @keyframes animation-open-default {
   0% {
     transform: scale(0.7);
+    opacity: 0;
   }
 
   45% {
@@ -46,11 +78,12 @@
   }
 
   80% {
-    transform: scale(0.95);
+    transform: scale(.95);
   }
 
   100% {
     transform: scale(1);
+    opacity: 1;
   }
 }
 

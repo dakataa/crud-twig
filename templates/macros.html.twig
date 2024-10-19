@@ -11,6 +11,11 @@
 							e.preventDefault();
 
 							window.closeModal();
+
+							loadAlertModule().then((Alert) => {
+								new Alert({title: 'Done', timeout: 2000, timeoutProgress: true}).show();
+							});
+
 							listView.dispatchEvent(new CustomEvent('reload'));
 						});
 					})
@@ -30,6 +35,7 @@
 							element.dataset.target = '#' + listView.id;
 							break;
 						}
+						case 'list':
 						case 'sort': {
 							element.dataset.toggle = 'ajax';
 							element.dataset.target = '#' + listView.id;
@@ -37,6 +43,8 @@
 						}
 					}
 				});
+
+				target.dataset.searchForm = '[name="filter"], [name="batch"]';
             };
 
 			const listView = document.querySelector('#{{ id }}');

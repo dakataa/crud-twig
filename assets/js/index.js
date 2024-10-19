@@ -1,6 +1,6 @@
 import './component/livequery';
 import {checkElementVisibility} from "./utils";
-import {Animation, Icon, Size} from "./component/alert/alert";
+import {default as Alert, Animation, Icon, Size} from "./component/alert/alert";
 
 // Alert
 window.loadAlertModule = () => new Promise((resolve) => import('./component/alert/alert').then(({default: alert}) => resolve(alert)));
@@ -10,13 +10,29 @@ window.loadDataFetcherModule = () => new Promise((resolve) => import('./componen
 
 document.liveQuery('[data-ajax-load]', function (el) {
 	window.loadDataFetcherModule().then((dataFetcher) => {
-		console.log('load dataFetcher');
-		const loadData = () => {
-			console.log('load', el.dataset.ajaxLoad);
-			return dataFetcher(el.dataset.ajaxLoad, el, el.dataset.mode, el.dataset.callback, el.dataset.callbackError, el.dataset.changeUrl, el.dataset.method);
+		const loadData = (formEl) => {
+			let url = el.dataset.ajaxLoad;
+			let data = null;
+			let method = el.dataset.method;
+			if(formEl instanceof HTMLFormElement) {
+				url = formEl.hasAttribute('action') ? formEl.action : url;
+				method = (formEl.method || method).toUpperCase();
+				data = new FormData(formEl);
+			}
+
+			return dataFetcher(url, el, el.dataset.mode, el.dataset.callback, el.dataset.callbackError, el.dataset.changeUrl, method, data);
 		}
 
-		el.addEventListener('reload', loadData);
+		document.addEventListener('submit', (e) => {
+			if(!e.target.matches(el.dataset.searchForm)) {
+				return;
+			}
+
+			e.preventDefault();
+			loadData(e.target);
+		});
+
+		el.addEventListener('reload', () => loadData());
 
 		checkElementVisibility(el)
 			.then(() => new Promise((resolve, reject) => {
@@ -54,25 +70,32 @@ document.liveQuery('[data-toggle="ajax"]', function (el) {
 			);
 
 			if (this.dataset.confirm) {
-				window
-					.loadAlertModule()
-					.then((Alert) => new Alert({
-						title: 'Confirm',
-						text: 'Do you want to delete this item?',
-						animation: Animation.scale,
-						icon: Icon.info,
-						size: Size.default,
-						actions: {
-							cancel: {
-								label: 'Cancel',
-								classList: ['btn-outline-primary']
-							},
-							confirm: {
-								label: 'Confirm',
-							}
+				new Alert({
+					title: 'Confirm',
+					text: 'Do you want to delete this item?',
+					animation: Animation.scale,
+					icon: Icon.info,
+					size: Size.default,
+					actions: {
+						cancel: {
+							label: 'Cancel',
+							classList: ['btn-outline-primary']
+						},
+						confirm: {
+							label: 'Confirm',
 						}
-					}).show())
-					.then(update)
+					}
+				})
+					.show()
+					.then(() => {
+						new Alert({
+							icon: Icon.success,
+							title: 'Done',
+							timeout: 2000
+						}).show();
+
+						update();
+					});
 			} else {
 				update();
 			}

@@ -5,9 +5,7 @@
 {% endblock title %}
 
 {% block body %}
-    {% block form_start %}
-        {{ form_start(form.modify.view, { action: app.request.uri, 'attr': { novalidate: 'novalidate', autocomplete: 'off', 'data-ajax':'true', 'data-callback': 'true'}}) }}
-    {% endblock %}
+
     <section class="edit">
         <header>
             {% block body_header %}
@@ -28,8 +26,14 @@
         </header>
         <main>
             {% block body_content %}
+                {% block form_start %}
+                    {{ form_start(form.modify.view, { action: app.request.uri, attr: { id: form.modify.view.vars.id, novalidate: 'novalidate', autocomplete: 'off', 'data-ajax': 'true', }}) }}
+                {% endblock %}
                 {% block form_body %}
                     {{ form_rest(form.modify.view) }}
+                {% endblock %}
+                {% block form_end %}
+                    {{ form_end(form.modify.view) }}
                 {% endblock %}
             {% endblock %}
         </main>
@@ -37,13 +41,11 @@
             {% block body_footer %}
             <div class="actions">
                 {% block form_actions %}
-                    <button class="btn btn-primary btn-save" type="submit">{{ 'Save'|trans }}</button>
+                    <button form="{{ form.modify.view.vars.id }}" class="btn btn-primary btn-save" type="submit">{{ 'Save'|trans }}</button>
                 {% endblock %}
             </div>
             {% endblock %}
         </footer>
     </section>
-    {% block form_end %}
-        {{ form_end(form.modify.view) }}
-    {% endblock %}
+
 {% endblock %}
