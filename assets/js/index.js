@@ -24,7 +24,7 @@ document.liveQuery('[data-ajax-load]', function (el) {
 		}
 
 		document.addEventListener('submit', (e) => {
-			if(!e.target.matches(el.dataset.searchForm)) {
+			if(!el.contains(e.target) || !e.target.matches(el.dataset.searchForm)) {
 				return;
 			}
 

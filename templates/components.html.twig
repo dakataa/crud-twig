@@ -6,7 +6,9 @@
             <tr>
                 {% if form.batch.view.method is defined and identifierField %}
                     <th style="width: 1%">
-                        <input type="checkbox" data-toggle="checkall" data-target=".ids"/>
+                        <label>
+                            <input type="checkbox" data-toggle="checkall" data-target=".ids"/>
+                        </label>
                     </th>
                 {% endif %}
                 {% for column in entity.columns %}
@@ -40,7 +42,7 @@
                     <tr id="row_{{ loop.index }}">
                         {% if rowIdentifier and form.batch.view.method is defined %}
                             <td>
-                                <input type="checkbox" class="ids" name="batch[ids][]" value="{{ rowIdentifier }}"/>
+                                <input form="{{ form.batch.view.vars.id }}" type="checkbox" class="ids" name="batch[ids][]" value="{{ rowIdentifier }}"/>
                             </td>
                         {% endif %}
                         {% for column in entity.columns %}
