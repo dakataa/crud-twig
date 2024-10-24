@@ -1,7 +1,5 @@
 const Encore = require('@symfony/webpack-encore');
 const Webpack = require('webpack');
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-const SpriteLoaderPlugin = require('svg-sprite-loader/plugin');
 
 const ASSET_OUTPUT_PATH = 'public/assets/';
 const ASSET_PUBLIC_PATH = '/bundles/dakataacrudtwig/assets';
@@ -14,23 +12,8 @@ Encore
     .setPublicPath(ASSET_PUBLIC_PATH)
 	.setManifestKeyPrefix('bundles/dakataacrudtwig')
     .cleanupOutputBeforeBuild()
-    .enableLessLoader()
+    //.enableLessLoader()
     .disableSingleRuntimeChunk()
-    .configureCssMinimizerPlugin((config) => {
-        config.parallel = true;
-        config.minify = [
-            CssMinimizerPlugin.cssnanoMinify,
-            CssMinimizerPlugin.cleanCssMinify,
-        ];
-        config.minimizerOptions = {
-            preset: [
-                'default',
-                {
-                    discardComments: {removeAll: true},
-                },
-            ],
-        };
-    })
     .configureTerserPlugin(config => {
         config.parallel = true;
         config.extractComments = false;
@@ -45,17 +28,11 @@ Encore
     .enableVersioning(true)
     .enableSourceMaps(!Encore.isProduction())
     .addEntry('theme', [
-        './assets/js/index.js',
-		'./assets/scss/theme.scss',
+        './assets/theme.js'
     ])
     .addPlugin(new Webpack.DefinePlugin({
         'process.env.WEBPACK_PUBLIC_PATH': JSON.stringify(ASSET_PUBLIC_PATH)
     }))
-    .addPlugin(
-        new SpriteLoaderPlugin({
-            plainSprite: true
-        })
-    )
 	.addLoader({
 		test: /\.s[ac]ss$/i,
 		use: [
@@ -66,13 +43,14 @@ Encore
 				loader: "sass-loader",
 				options: {
 					implementation: require('sass'),
+					sourceMap: !Encore.isProduction(),
+					sassOptions: {
+						style: "compressed",
+					},
 				},
 			},
 		],
 	})
-    // .addPlugin(
-    //     new SimplifyCssModulesPlugin()
-    // )
     // .copyFiles([
     //     {from: './assets/images', to: 'images/[path][name].[ext]'},
     // ])

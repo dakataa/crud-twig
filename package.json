@@ -24,6 +24,8 @@
 		"webpack-notifier": "^1.8.0"
 	},
 	"dependencies": {
+		"@dakataa/bootstrap-alert": "^1.0.0",
+		"@dakataa/crud-theme": "^1.0.0",
 		"@dakataa/requester": "^1.0.0",
 		"@popperjs/core": "^2.11.5",
 		"bootstrap": "^5.3.3",
