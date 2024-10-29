@@ -1,9 +1,8 @@
 import './component/livequery';
 import {checkElementVisibility} from "./utils";
-import {default as Alert, Animation, Icon, Size} from "./component/alert/alert";
 
 // Alert
-window.loadAlertModule = () => new Promise((resolve) => import('./component/alert/alert').then(({default: alert}) => resolve(alert)));
+window.loadAlertModule = () => new Promise((resolve) => import('@dakataa/bootstrap-alert').then(({default: Alert, Animation, Icon, Size}) => resolve({Alert, Animation, Icon, Size})));
 
 // Data Fetcher
 window.loadDataFetcherModule = () => new Promise((resolve) => import('./component/dataFetcher').then(({default: dataFetcher}) => resolve(dataFetcher)));
@@ -55,50 +54,52 @@ document.liveQuery('[data-ajax-load]', function (el) {
 	});
 });
 
-document.liveQuery('[data-toggle="ajax"]', function (el) {
-	window.loadDataFetcherModule().then((dataFetcher) => {
-		el.addEventListener('click', function (e) {
-			e.preventDefault();
+window.loadAlertModule().then(({Alert, Animation, Icon, Size}) => {
+	document.liveQuery('[data-toggle="ajax"]', function (el) {
+		window.loadDataFetcherModule().then((dataFetcher) => {
+			el.addEventListener('click', function (e) {
+				e.preventDefault();
 
-			const update = () => fetchUrl(
-				el.href, el.dataset.target || null,
-				el.dataset.mode || null,
-				el.dataset.callback || null,
-				el.dataset.callbackError || null,
-				el.dataset.changeurl || false,
-				el.dataset.method || null
-			);
+				const update = () => fetchUrl(
+					el.href, el.dataset.target || null,
+					el.dataset.mode || null,
+					el.dataset.callback || null,
+					el.dataset.callbackError || null,
+					el.dataset.changeurl || false,
+					el.dataset.method || null
+				);
 
-			if (this.dataset.confirm) {
-				new Alert({
-					title: 'Confirm',
-					text: 'Do you want to delete this item?',
-					animation: Animation.scale,
-					icon: Icon.info,
-					size: Size.default,
-					actions: {
-						cancel: {
-							label: 'Cancel',
-							classList: ['btn-outline-primary']
-						},
-						confirm: {
-							label: 'Confirm',
+				if (this.dataset.confirm) {
+					new Alert({
+						title: 'Confirm',
+						text: 'Do you want to delete this item?',
+						animation: Animation.scale,
+						icon: Icon.info,
+						size: Size.default,
+						actions: {
+							cancel: {
+								label: 'Cancel',
+								classList: ['btn-outline-primary']
+							},
+							confirm: {
+								label: 'Confirm',
+							}
 						}
-					}
-				})
-					.show()
-					.then(() => {
-						new Alert({
-							icon: Icon.success,
-							title: 'Done',
-							timeout: 2000
-						}).show();
+					})
+						.show()
+						.then(() => {
+							new Alert({
+								icon: Icon.success,
+								title: 'Done',
+								timeout: 2000
+							}).show();
 
-						update();
-					});
-			} else {
-				update();
-			}
+							update();
+						});
+				} else {
+					update();
+				}
+			});
 		});
 	});
 });
@@ -114,7 +115,7 @@ document.liveQuery('form[data-ajax]', (el) => {
 
 
 // Bootstrap Tabs
-window.loadTabModule = () => new Promise((resolve) => import('bootstrap/js/src/tab').then(({default: tab}) => resolve(tab)));
+window.loadTabModule = () => new Promise((resolve) => import('bootstrap').then(({Tab: tab}) => resolve(tab)));
 document.liveQuery('[data-bs-toggle="tab"]', function (el) {
 	loadTabModule().then(() => {
 
@@ -122,7 +123,7 @@ document.liveQuery('[data-bs-toggle="tab"]', function (el) {
 });
 
 // Bootstrap Collapse
-window.loadCollapseModule = () => new Promise((resolve) => import("bootstrap/js/src/collapse").then(({default: collapse}) => resolve(collapse)));
+window.loadCollapseModule = () => new Promise((resolve) => import("bootstrap").then(({Collapse: collapse}) => resolve(collapse)));
 document.liveQuery('[data-bs-toggle="collapse"]', function (el) {
 	loadCollapseModule().then((Collapse) => {
 		Collapse.getOrCreateInstance(el);
@@ -138,12 +139,11 @@ document.liveQuery('[data-bs-toggle="collapse"]', function (el) {
 });
 
 // Bootstrap Download
-window.loadDropdownModule = () => new Promise((resolve) => import("bootstrap/js/src/dropdown").then(({default: dropdown}) => resolve(dropdown)));
-document.liveQuery('[data-bs-toggle="dropdown"]', (el) => loadDropdownModule().then((Dropdown) => {
-}));
+window.loadDropdownModule = () => new Promise((resolve) => import("bootstrap").then(({Dropdown: dropdown}) => resolve(dropdown)));
+document.liveQuery('[data-bs-toggle="dropdown"]', (el) => loadDropdownModule().then((dropdown) => {}));
 
 // Bootstrap Modal
-window.loadModalModule = () => new Promise((resolve) => import("bootstrap/js/src/modal").then(({default: modal}) => resolve(modal)));
+window.loadModalModule = () => new Promise((resolve) => import("bootstrap").then(({Modal: modal}) => resolve(modal)));
 window.loadModalDataFetcherModule = () => new Promise((resolve) => import('./component/modal.dataFetcher').then(({default: dataFetcher}) => resolve(dataFetcher)));
 document.liveQuery('[data-toggle="modal"]', function (el) {
 	el.addEventListener('click', (e) => {
@@ -175,7 +175,7 @@ window.closeModal = function () {
 }
 
 // Bootstrap Tooltip
-window.loadTooltipModule = () => new Promise((resolve) => import('bootstrap/js/src/tooltip').then(({default: tooltip}) => resolve(tooltip)));
+window.loadTooltipModule = () => new Promise((resolve) => import('bootstrap').then(({Tooltip: tooltip}) => resolve(tooltip)));
 document.liveQuery('[data-bs-toggle="tooltip"]', (el) => window.loadTooltipModule().then((Tooltip) => {
 	new Tooltip.getOrCreateInstance(el, {
 		boundary: 'window'

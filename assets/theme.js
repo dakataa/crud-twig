@@ -1,2 +1,2 @@
-import './scss/theme.scss';
-import './js/index';
+import '@dakataa/crud-theme/scss/theme.scss';
+import './js';

@@ -112,7 +112,7 @@
                 <label>
                     <select name="limit" class="form-select w-auto mb-2 ms-auto">
                         {% for maxResultChoice in [20, 40, 60, 80, 100] %}
-                            <option  {% if maxResultChoice == entity.data.meta.maxResults %}selected="selected"{% endif%} value="{{ maxResultChoice }}">{{ maxResultChoice }}</option>
+                            <option {% if maxResultChoice == entity.data.meta.maxResults %}selected="selected"{% endif%} value="{{ maxResultChoice }}">{{ maxResultChoice }}</option>
                         {% endfor %}
                     </select>
                 </label>

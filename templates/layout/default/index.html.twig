@@ -4,9 +4,15 @@
     <title>{% block title %}Admin{% endblock %}</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"/>
+    <script type="text/javascript">
+		if (navigator.serviceWorker !== undefined) {
+			navigator.serviceWorker.register('{{ asset('bundles/dakataacrudtwig/sw.js', 'dakataa_crud_twig') }}');
+		}
+    </script>
+    <link rel="stylesheet" type="text/css" href="{{ asset('bundles/dakataacrudtwig/theme.css', 'dakataa_crud_twig') }}"/>
+    <script defer type="text/javascript" src="{{ asset('bundles/dakataacrudtwig/theme.js', 'dakataa_crud_twig') }}"></script>
     {% block stylesheets %}
     {% endblock %}
-    <script defer type="text/javascript" src="{{ asset('bundles/dakataacrudtwig/theme.js', 'dakataa_crud_twig') }}"></script>
 </head>
 <body>
 <header>
@@ -97,9 +103,9 @@
 			document.body.classList.add('unload');
 		});
 
-		window.addEventListener('unload', function () {
-			document.body.classList.remove('unload');
-		});
+		// window.addEventListener('unload', function () {
+		// 	document.body.classList.remove('unload');
+		// });
 
 		const updateNavigationActivity = function () {
 			let matches = [],
