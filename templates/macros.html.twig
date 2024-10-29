@@ -12,7 +12,7 @@
 
 							window.closeModal();
 
-							loadAlertModule().then((Alert) => {
+							loadAlertModule().then(({Alert}) => {
 								new Alert({title: 'Done', timeout: 2000, timeoutProgress: true}).show();
 							});
 

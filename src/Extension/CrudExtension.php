@@ -10,7 +10,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -18,7 +17,6 @@ use Twig\TwigFunction;
 
 class CrudExtension extends AbstractExtension
 {
-
 	public function __construct(
 		protected RequestStack $requestStack,
 		protected EntityManagerInterface $entityManager,

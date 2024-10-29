@@ -1,9 +1,8 @@
 import './component/livequery';
 import {checkElementVisibility} from "./utils";
-import {default as Alert, Animation, Icon, Size} from "@dakataa/bootstrap-alert";
 
 // Alert
-window.loadAlertModule = () => new Promise((resolve) => import('@dakataa/bootstrap-alert').then(({default: alert}) => resolve(alert)));
+window.loadAlertModule = () => new Promise((resolve) => import('@dakataa/bootstrap-alert').then(({default: Alert, Animation, Icon, Size}) => resolve({Alert, Animation, Icon, Size})));
 
 // Data Fetcher
 window.loadDataFetcherModule = () => new Promise((resolve) => import('./component/dataFetcher').then(({default: dataFetcher}) => resolve(dataFetcher)));
@@ -55,50 +54,52 @@ document.liveQuery('[data-ajax-load]', function (el) {
 	});
 });
 
-document.liveQuery('[data-toggle="ajax"]', function (el) {
-	window.loadDataFetcherModule().then((dataFetcher) => {
-		el.addEventListener('click', function (e) {
-			e.preventDefault();
+window.loadAlertModule().then(({Alert, Animation, Icon, Size}) => {
+	document.liveQuery('[data-toggle="ajax"]', function (el) {
+		window.loadDataFetcherModule().then((dataFetcher) => {
+			el.addEventListener('click', function (e) {
+				e.preventDefault();
 
-			const update = () => fetchUrl(
-				el.href, el.dataset.target || null,
-				el.dataset.mode || null,
-				el.dataset.callback || null,
-				el.dataset.callbackError || null,
-				el.dataset.changeurl || false,
-				el.dataset.method || null
-			);
+				const update = () => fetchUrl(
+					el.href, el.dataset.target || null,
+					el.dataset.mode || null,
+					el.dataset.callback || null,
+					el.dataset.callbackError || null,
+					el.dataset.changeurl || false,
+					el.dataset.method || null
+				);
 
-			if (this.dataset.confirm) {
-				new Alert({
-					title: 'Confirm',
-					text: 'Do you want to delete this item?',
-					animation: Animation.scale,
-					icon: Icon.info,
-					size: Size.default,
-					actions: {
-						cancel: {
-							label: 'Cancel',
-							classList: ['btn-outline-primary']
-						},
-						confirm: {
-							label: 'Confirm',
+				if (this.dataset.confirm) {
+					new Alert({
+						title: 'Confirm',
+						text: 'Do you want to delete this item?',
+						animation: Animation.scale,
+						icon: Icon.info,
+						size: Size.default,
+						actions: {
+							cancel: {
+								label: 'Cancel',
+								classList: ['btn-outline-primary']
+							},
+							confirm: {
+								label: 'Confirm',
+							}
 						}
-					}
-				})
-					.show()
-					.then(() => {
-						new Alert({
-							icon: Icon.success,
-							title: 'Done',
-							timeout: 2000
-						}).show();
+					})
+						.show()
+						.then(() => {
+							new Alert({
+								icon: Icon.success,
+								title: 'Done',
+								timeout: 2000
+							}).show();
 
-						update();
-					});
-			} else {
-				update();
-			}
+							update();
+						});
+				} else {
+					update();
+				}
+			});
 		});
 	});
 });
