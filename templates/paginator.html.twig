@@ -1,4 +1,4 @@
-{% if (data is defined) and (route is defined) %}
+{% if (data is defined) and (action is defined) %}
     {% set totalPages = data.meta.totalPages %}
     <div class="d-flex flex-column">
         <small class="mb-2 text-center">
@@ -9,19 +9,19 @@
                 <ul class="pagination pagination-sm">
                     {% if (data.meta.page > 1) and (data.meta.totalPages > 5) %}
                         <li class="page-item">
-                            <a title="{{ 'first page'|trans }}" {% if ajax is defined %}data-toggle="ajax" data-target="{{ ajax }}" data-mode="replace"{% endif %} href="{{ generatePath(route, params|default({})|merge({page: 1})) }}" class="page-link">
+                            <a data-action="{{ action.name }}" title="{{ 'first page'|trans }}" href="{{ generatePathByAction(action, params|default({})|merge({page: 1})) }}" class="page-link">
                                 &laquo;
                             </a>
                         </li>
                     {% endif %}
                     {% for page in data.meta.links %}
                         <li class="page-item{% if page == data.meta.page %} active{% endif %}">
-                            <a {% if ajax is defined %}data-toggle="ajax" data-target="{{ ajax }}" data-mode="replace"{% endif %} href="{{ generatePath(route, params|default({})|merge({page: page})) }}" class="page-link">{{ page }}</a>
+                            <a data-action="{{ action.name }}" href="{{ generatePathByAction(action, params|default({})|merge({page: page})) }}" class="page-link">{{ page }}</a>
                         </li>
                     {% endfor %}
                     {% if (data.meta.page < totalPages) and (totalPages > 5) %}
                         <li class="page-item">
-                            <a title="{{ 'last page'|trans }}" {% if ajax is defined %}data-toggle="ajax" data-target="{{ ajax }}" data-mode="replace" data-changeurl="true"{% endif %} href="{{ generatePath(route, params|default({})|merge({page: totalPages})) }}" class="page-link">
+                            <a data-action="{{ action.name }}" title="{{ 'last page'|trans }}" href="{{ generatePathByAction(action, params|default({})|merge({page: totalPages})) }}" class="page-link">
                                 &raquo;
                             </a>
                         </li>

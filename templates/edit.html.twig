@@ -5,7 +5,6 @@
 {% endblock title %}
 
 {% block body %}
-
     <section class="edit">
         <header>
             {% block body_header %}
@@ -15,19 +14,21 @@
                             {{ block('title') }}
                         {% endblock %}
                     </h2>
-                    <nav class="nav">
+                    <nav>
                         {% block body_header_navigation %}
                         {% endblock %}
                     </nav>
-                    {% if not form.modify.view.vars.valid %}
-                        {{ form_errors(form.modify.view) }}
-                    {% endif %}
             {% endblock %}
         </header>
         <main>
             {% block body_content %}
                 {% block form_start %}
                     {{ form_start(form.modify.view, { action: app.request.uri, attr: { id: form.modify.view.vars.id, novalidate: 'novalidate', autocomplete: 'off', 'data-ajax': 'true', }}) }}
+                {% endblock %}
+                {% block form_errors %}
+                    {% if not form.modify.view.vars.valid %}
+                        {{ form_errors(form.modify.view) }}
+                    {% endif %}
                 {% endblock %}
                 {% block form_body %}
                     {{ form_rest(form.modify.view) }}

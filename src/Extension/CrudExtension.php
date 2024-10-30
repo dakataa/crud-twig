@@ -33,6 +33,7 @@ class CrudExtension extends AbstractExtension
 			new TwigFunction('hasAction', [$this, 'hasAction']),
 			new TwigFunction('generatePath', [$this, 'generatePath']),
 			new TwigFunction('generatePathByAction', [$this, 'generatePathByAction']),
+			new TwigFunction('getCurrentAction', [$this, 'getCurrentAction']),
 			new TwigFunction('getAction', [$this, 'getAction']),
 			new TwigFunction('getRoute', [$this, 'getRoute']),
 			new TwigFunction('entityPrimaryKey', [$this, 'entityPrimaryKey']),
@@ -50,9 +51,19 @@ class CrudExtension extends AbstractExtension
 
 	public function entityPrimaryKey(object $entity): mixed
 	{
-		return $this->entityManager->getClassMetadata(get_class($entity))->getSingleIdReflectionProperty()->getValue(
+		return $this->entityManager->getClassMetadata(get_class($entity))->getSingleIdReflectionProperty()?->getValue(
 			$entity
 		);
+	}
+
+	public function getCurrentAction(): Action
+	{
+		[$controller, $method] = $this->getController();
+		if(null === $action = $this->actionCollection->load($controller, method: $method)->current()) {
+			throw new Exception(sprintf('Current "%s::%s" is not a CRUD Action.', $controller, $method));
+		}
+
+		return $action;
 	}
 
 	public function getAction(
@@ -64,7 +75,9 @@ class CrudExtension extends AbstractExtension
 		$action = array_values(
 			array_filter(
 				iterator_to_array($this->actionCollection->getAll()),
-				fn(Action $action) => $action->entity === $entityName && $action->getName() === $actionName && (!$namespace || $action->namespace === $namespace)
+				fn(Action $action) => $action->entity === $entityName &&
+					$action->getName() === $actionName &&
+					(!$namespace || $action->namespace === $namespace)
 			)
 		)[0] ?? null;
 
@@ -80,7 +93,8 @@ class CrudExtension extends AbstractExtension
 		$controllerFQCN ??= $this->getControllerClass();
 		$actions = $this->crudSubscriber->getController()?->getActions();
 
-		return (array_values(array_filter($actions, fn(Action $action) => $action->getName() === $actionName))[0] ?? null)?->getRoute()->getName() ?? ($controllerFQCN.'::'.$actionName);
+		return (array_values(array_filter($actions, fn(Action $action) => $action->getName() === $actionName)
+		)[0] ?? null)?->getRoute()->getName() ?? ($controllerFQCN.'::'.$actionName);
 	}
 
 	public function hasAction(string $actionName): bool
@@ -96,13 +110,17 @@ class CrudExtension extends AbstractExtension
 			throw new Exception('Cannot generate Path for Action without Route.');
 		}
 
-		$routePathVariables = $this->router->getRouteCollection()->get($action->getRoute()->getName())?->compile()->getPathVariables() ?: [];
+		$routePathVariables = $this->router->getRouteCollection()->get($action->getRoute()->getName())?->compile(
+		)->getPathVariables() ?: [];
 		$currentPathParameters = array_intersect_key(
 			$this->requestStack->getMainRequest()->attributes->all(),
 			array_flip($routePathVariables)
 		);
 
-		return $this->router->generate($action->getRoute()->getName(), array_merge($currentPathParameters, $parameters ?? []));
+		return $this->router->generate(
+			$action->getRoute()->getName(),
+			array_merge($currentPathParameters, $parameters ?? [])
+		);
 	}
 
 	public function generatePath(): string
@@ -131,9 +149,17 @@ class CrudExtension extends AbstractExtension
 		);
 	}
 
+	/**
+	 * @return array & [string, string]
+	 */
+	public function getController(): array
+	{
+		return explode('::', $this->requestStack->getMainRequest()->attributes->get('_controller'));
+	}
+
 	public function getControllerClass(): string
 	{
-		return explode('::', $this->requestStack->getMainRequest()->attributes->get('_controller'))[0];
+		return $this->getController()[0];
 	}
 
 	public function getParameter(string $key): mixed

@@ -1,4 +1,5 @@
 {% block ListView %}
+    {% set currentAction = getCurrentAction() %}
     {% set identifierField = entity.primaryColumn %}
     <div class="table-responsive">
         <table class="table table-striped table-hover table-bordered">
@@ -19,7 +20,7 @@
                             {% if column.sortable and attribute(sort, column.field) is defined %}
                                 {% set currentSortType = attribute(sort, column.field)|default(null) %}
                                 {% set nextSortType = (currentSortType ? (currentSortType == 'ASC' ? 'DESC' : null) : 'ASC') %}
-                                <a data-action="sort" href="{{ generatePath('list', { ...app.request.query.all, sort: (sort|default({}))|merge({(column.field): (nextSortType|default('')) }) }) }}">
+                                <a data-action="sort" href="{{ generatePathByAction(currentAction, { ...app.request.query.all, sort: (sort|default({}))|merge({(column.field): (nextSortType|default('')) }) }) }}">
                                     {% if (currentSortType) %}
                                         {{ (currentSortType == 'ASC' ? '&uarr;':'&darr;') }}
                                     {% else %}
