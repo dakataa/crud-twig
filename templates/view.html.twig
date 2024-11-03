@@ -1,6 +1,6 @@
 {% extends [getParameter('layout')|default(''), '@DakataaCrudTwig/layout/default/auto.html.twig'] %}
 
-{%- block title -%}View{% endblock title %}
+{%- block title -%}{{ title|default('View') }}{% endblock title %}
 
 {% block body %}
     <section class="edit">

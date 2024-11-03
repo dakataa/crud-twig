@@ -1,5 +1,6 @@
 {% if (data is defined) and (action is defined) %}
     {% set totalPages = data.meta.totalPages %}
+    {% if totalPages is not null %}
     <div class="d-flex flex-column">
         <small class="mb-2 text-center">
             {{ data.meta.totalResults }} - {{ 'Page'|trans }} {{ data.meta.page }} {{ 'of'|trans }} {{ data.meta.totalPages }}
@@ -30,4 +31,5 @@
             </nav>
         {% endif %}
     </div>
+    {% endif %}
 {% endif %}

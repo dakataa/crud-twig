@@ -48,7 +48,7 @@
             {% block body_navigation %}
                 <div class="d-flex align-items-center">
                     <nav class="btn-group btn-group-sm me-2">
-                        {% for action in action|filter(a => false == a.object) %}
+                        {% for action in action|filter(a => false == a.object and a.name != currentAction.name) %}
                             <a href="{{ generatePathByAction(action) }}" data-action="{{ action.name }}" class="btn btn-outline-secondary">
                                 {{ action.title|trans }}
                             </a>
