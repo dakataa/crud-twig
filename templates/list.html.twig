@@ -35,7 +35,6 @@
 {% endmacro %}
 
 {% set hasFilters = form.filter.view.vars.data|default([])|filter(v => v)|length %}
-{% set identifierField = entity.primaryColumn %}
 {% block body %}
     <section class="list">
         <header class="content-header d-md-flex mb-3 justify-content-between align-items-center">

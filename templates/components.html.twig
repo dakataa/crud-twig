@@ -39,7 +39,7 @@
             <tbody>
             {% if entity.data.items|length %}
                 {% for row in entity.data.items %}
-                    {% set rowIdentifier = row[entity.primaryColumn.field] ?? null %}
+                    {% set rowIdentifier = row[entity.primaryColumn.alias] %}
                     <tr id="row_{{ loop.index }}">
                         {% if rowIdentifier and form.batch.view.method is defined %}
                             <td>
@@ -55,9 +55,13 @@
                             {% else %}
                                 {% block columnBlockKey %}
                                     <td>
-                                        {% block columnValueBlockKey %}
-                                            {{ value }}
-                                        {% endblock %}
+                                        {% if (block(columnValueBlockKey) is defined) and (block(columnValueBlockKey) is not empty) %}
+                                            {{ block(columnValueBlockKey)|raw }}
+                                        {% else %}
+                                            {% block columnValueBlockKey %}
+                                                {{ value }}
+                                            {% endblock %}
+                                        {% endif %}
                                     </td>
                                 {% endblock %}
                             {% endif %}

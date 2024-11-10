@@ -12,9 +12,11 @@ export default function liveQuery(selector, callback) {
 			const callback = observeSelectorCallbacks[target][selector];
 
 			target.querySelectorAll(selector).forEach((element) => {
-				if ((element.liveQueryReady || []).includes(selector) === false) {
-					element.liveQueryReady = element.liveQueryReady || [];
-					element.liveQueryReady.push(selector);
+				if (((element.liveQueryReady || {})[target] || []).includes(selector) === false) {
+					element.liveQueryReady = {
+						...element.liveQueryReady,
+						[target]: [...((element.liveQueryReady || {})[target] || []), selector]
+					};
 
 					// Invoke the callback with the element
 					callback.call(element, element);

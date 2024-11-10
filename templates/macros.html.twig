@@ -3,10 +3,11 @@
     <div id="{{ id }}" data-ajax-load="{{ generatePathByAction(getAction(entityName, 'list', namespace), parameters) }}"></div>
     <script type="text/javascript">
 		(() => {
-			window.addEventListener('load', () => {
-				document.liveQuery('.modal', (el) => {
-					updateActions(el);
-					el.querySelectorAll('form[data-ajax]').forEach((formEl) => {
+			const onShowModal = (el) => {
+				console.log('show', el);
+				el.addEventListener('show.ajax.modal',  (e) => {
+					const modalEl = e.detail.target;
+					modalEl.querySelectorAll('form[data-ajax]').forEach((formEl) => {
 						formEl.addEventListener('success', (e) => {
 							e.preventDefault();
 
@@ -16,13 +17,16 @@
 								new Alert({title: 'Done', timeout: 2000, timeoutProgress: true}).show();
 							});
 
-							listView.dispatchEvent(new CustomEvent('reload'));
+							el.closest(['[id^="list-view"]']).dispatchEvent(new CustomEvent('reload'));
 						});
-					})
-                });
-			});
+					});
+
+					updateActions(modalEl);
+				});
+			}
 
             const updateActions = (target) => {
+				console.log('update');
 				target.querySelectorAll('a[data-action]').forEach((element) => {
 					switch (element.dataset.action) {
 						case 'view':
@@ -48,7 +52,11 @@
             };
 
 			const listView = document.querySelector('#{{ id }}');
-			listView.addEventListener('loaded', (e) => updateActions(e.target));
+
+			window.addEventListener('load', () => {
+				listView.liveQuery('[data-toggle="modal"]', (el) => onShowModal(el));
+				listView.addEventListener('loaded', (e) => updateActions(e.target));
+			});
 
 		})();
     </script>

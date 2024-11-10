@@ -110,8 +110,7 @@ class CrudExtension extends AbstractExtension
 			throw new Exception('Cannot generate Path for Action without Route.');
 		}
 
-		$routePathVariables = $this->router->getRouteCollection()->get($action->getRoute()->getName())?->compile(
-		)->getPathVariables() ?: [];
+		$routePathVariables = $this->router->getRouteCollection()->get($action->getRoute()->getName())?->compile()->getPathVariables() ?: [];
 		$currentPathParameters = array_intersect_key(
 			$this->requestStack->getMainRequest()->attributes->all(),
 			array_flip($routePathVariables)

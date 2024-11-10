@@ -9,17 +9,17 @@ window.loadDataFetcherModule = () => new Promise((resolve) => import('./componen
 
 document.liveQuery('[data-ajax-load]', function (el) {
 	window.loadDataFetcherModule().then((dataFetcher) => {
-		const loadData = (formEl) => {
-			let url = el.dataset.ajaxLoad;
+		const loadData = (targetEl, formEl) => {
+			let url = targetEl.dataset.ajaxLoad;
 			let data = null;
-			let method = el.dataset.method;
+			let method = targetEl.dataset.method;
 			if(formEl instanceof HTMLFormElement) {
 				url = formEl.hasAttribute('action') ? formEl.action : url;
 				method = (formEl.method || method).toUpperCase();
 				data = new FormData(formEl);
 			}
 
-			return dataFetcher(url, el, el.dataset.mode, el.dataset.callback, el.dataset.callbackError, el.dataset.changeUrl, method, data);
+			return dataFetcher(url, targetEl, targetEl.dataset.mode, targetEl.dataset.callback, targetEl.dataset.callbackError, targetEl.dataset.changeUrl, method, data);
 		}
 
 		document.addEventListener('submit', (e) => {
@@ -28,10 +28,12 @@ document.liveQuery('[data-ajax-load]', function (el) {
 			}
 
 			e.preventDefault();
-			loadData(e.target);
+			loadData(el, e.target);
 		});
 
-		el.addEventListener('reload', () => loadData());
+		el.addEventListener('reload', (e) => {
+			loadData(e.target)
+		});
 
 		checkElementVisibility(el)
 			.then(() => new Promise((resolve, reject) => {
@@ -46,7 +48,7 @@ document.liveQuery('[data-ajax-load]', function (el) {
 
 				isOk(el);
 			}))
-			.then(loadData)
+			.then(() => loadData(el))
 			.catch((error) => {
 				console.log('error', error);
 			});
