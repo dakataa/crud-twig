@@ -1,7 +1,8 @@
 {% block ListView %}
     {% set currentAction = getCurrentAction() %}
     {% set identifierField = entity.primaryColumn %}
-    <div class="table-responsive">
+    {% set listViewId = 'list-view-' ~ entity.name %}
+    <div class="table-responsive" id="{{ listViewId }}">
         <table class="table table-striped table-hover table-bordered">
             <thead>
             <tr>
@@ -43,7 +44,9 @@
                     <tr id="row_{{ loop.index }}">
                         {% if rowIdentifier and form.batch.view.method is defined %}
                             <td>
-                                <input form="{{ form.batch.view.vars.id }}" type="checkbox" class="ids" name="batch[ids][]" value="{{ rowIdentifier }}"/>
+                                <label>
+                                    <input form="{{ form.batch.view.vars.id }}" type="checkbox" class="ids" name="{{ form.batch.view.vars.name }}[ids][]" value="{{ rowIdentifier }}"/>
+                                </label>
                             </td>
                         {% endif %}
                         {% for column in entity.columns %}
@@ -70,7 +73,7 @@
                             <td class="text-end text-nowrap">
                                 {% for action in action|filter(a => a.object) %}
                                     {% if 'DELETE' in action.route.methods %}
-                                        <a data-action="{{ action.name }}" data-method="DELETE" href="{{ generatePath(action.name, {id: rowIdentifier}) }}" class="btn btn-sm btn-outline-danger mb-1 ms-1" data-toggle="ajax" data-confirm="Are you sure?">
+                                        <a data-action="{{ action.name }}" data-method="DELETE" href="{{ generatePath(action.name, {id: rowIdentifier}) }}" class="btn btn-sm btn-outline-danger mb-1 ms-1" data-toggle="ajax" data-target="#{{ listViewId }}" data-mode="replace" data-confirm="Are you sure?">
                                             {{ action.title|trans }}
                                         </a>
                                     {% else %}

@@ -1,10 +1,9 @@
 {% macro AjaxListView(entityName, namespace, parameters = []) %}
-    {% set id = 'list-view-' ~ entityName %}
+    {% set id = 'ajax-list-view-' ~ entityName %}
     <div id="{{ id }}" data-ajax-load="{{ generatePathByAction(getAction(entityName, 'list', namespace), parameters) }}"></div>
     <script type="text/javascript">
 		(() => {
 			const onShowModal = (el) => {
-				console.log('show', el);
 				el.addEventListener('show.ajax.modal',  (e) => {
 					const modalEl = e.detail.target;
 					modalEl.querySelectorAll('form[data-ajax]').forEach((formEl) => {
@@ -17,7 +16,7 @@
 								new Alert({title: 'Done', timeout: 2000, timeoutProgress: true}).show();
 							});
 
-							el.closest(['[id^="list-view"]']).dispatchEvent(new CustomEvent('reload'));
+							el.closest(['[id^="ajax-list-view"]']).dispatchEvent(new CustomEvent('reload'));
 						});
 					});
 
@@ -26,7 +25,6 @@
 			}
 
             const updateActions = (target) => {
-				console.log('update');
 				target.querySelectorAll('a[data-action]').forEach((element) => {
 					switch (element.dataset.action) {
 						case 'view':

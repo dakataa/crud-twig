@@ -6,16 +6,17 @@ const observeSelectorCallbacks = {};
 
 export default function liveQuery(selector, callback) {
 	const target = this;
+	target.liveQueryId ??= ('id' + Math.round(Math.random() * Number.MAX_SAFE_INTEGER));
 
 	const triggerCallbacks = (target) => {
-		(observeSelectors[target] || []).forEach((selector) => {
-			const callback = observeSelectorCallbacks[target][selector];
+		(observeSelectors[target.liveQueryId] || []).forEach((selector) => {
+			const callback = observeSelectorCallbacks[target.liveQueryId][selector];
 
 			target.querySelectorAll(selector).forEach((element) => {
-				if (((element.liveQueryReady || {})[target] || []).includes(selector) === false) {
+				if (((element.liveQueryReady || {})[target.liveQueryId] || []).includes(selector) === false) {
 					element.liveQueryReady = {
 						...element.liveQueryReady,
-						[target]: [...((element.liveQueryReady || {})[target] || []), selector]
+						[target.liveQueryId]: [...((element.liveQueryReady || {})[target.liveQueryId] || []), selector]
 					};
 
 					// Invoke the callback with the element
@@ -24,31 +25,32 @@ export default function liveQuery(selector, callback) {
 			});
 		})
 	}
-	const observer = new MutationObserver((mutationsList) => {
-		if(observeSelectors[target] === undefined) {
-			return;
-		}
 
-		const selectors = observeSelectors[target].join(',');
-		let hasMatch = false;
-		mutationsList.forEach(function (mutationRecord) {
-			switch (mutationRecord.type) {
-				case 'attributes':
-				case 'childList': {
-					hasMatch = mutationRecord.target.matches(selectors) || mutationRecord.target.querySelector(selectors);
-					break;
-				}
+	if (observeSelectors[target.liveQueryId] === undefined) {
+		const observer = new MutationObserver((mutationsList) => {
+			if (observeSelectors[target.liveQueryId] === undefined) {
+				return;
 			}
+
+			const selectors = observeSelectors[target.liveQueryId].join(',');
+			let hasMatch = false;
+			mutationsList.forEach(function (mutationRecord) {
+				switch (mutationRecord.type) {
+					case 'attributes':
+					case 'childList': {
+						hasMatch = mutationRecord.target.matches(selectors) || mutationRecord.target.querySelector(selectors);
+						break;
+					}
+				}
+			});
+
+			if (!hasMatch) {
+				return;
+			}
+
+			triggerCallbacks(target);
 		});
 
-		if(!hasMatch) {
-			return;
-		}
-
-		triggerCallbacks(target);
-	});
-
-	if(observeSelectors[target] === undefined) {
 		observer.observe(target, {
 			childList: true,
 			subtree: true,
@@ -56,8 +58,15 @@ export default function liveQuery(selector, callback) {
 		});
 	}
 
-	observeSelectors[target] = [...(observeSelectors[target] || []), selector].filter((value, index, array) => array.indexOf(value) === index);
-	observeSelectorCallbacks[target] = {...(observeSelectorCallbacks[target] || {}), [selector]: callback};
+	observeSelectors[target.liveQueryId] = [
+		...(observeSelectors[target.liveQueryId] || []),
+		selector
+	].filter((value, index, array) => array.indexOf(value) === index);
+
+	observeSelectorCallbacks[target.liveQueryId] = {
+		...(observeSelectorCallbacks[target.liveQueryId] || {}),
+		[selector]: callback
+	};
 
 	triggerCallbacks(target);
 }

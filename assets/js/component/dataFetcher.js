@@ -1,7 +1,7 @@
 'use strict';
 
 import logger from "./logger";
-import Requester, {RequestBodyType} from "@dakataa/requester";
+import Requester from "@dakataa/requester";
 
 Requester.defaults = {
 	baseURL: document.location.href
@@ -89,117 +89,114 @@ export default async function fetchUrl(url, container, mode, callback, callbackE
 		method,
 		body: ['POST', 'PUT'].includes(method) ? requestData : null,
 		query: ['GET'].includes(method) ? requestData : null,
-		signal: request[url]?.signal}).then((r) => {
+		signal: request[url]?.signal
+	}).then((r) => {
 		response = r;
 		return r.getData()
 	}).then((data) => {
-			delete request[url];
+		delete request[url];
 
-			status = response.status;
-			redirected = response.redirected ? response.url : false;
-			contentType = (response.getHeaders().get('content-type') || 'text/html').split(';').shift();
-			json = contentType === 'application/json';
+		status = response.status;
+		redirected = response.redirected ? response.url : false;
+		contentType = (response.getHeaders().get('content-type') || 'text/html').split(';').shift();
+		json = contentType === 'application/json';
 
-			return data;
-		})
-		.then(function (data) {
-			if (typeof (document) !== "undefined") {
-				document.querySelectorAll('[data-page-preloader]').forEach((e) => {
-					e.hidden = true;
-					e.classList.remove('active');
-				});
-			}
+		return data;
+	}).then(function (data) {
+		if (typeof (document) !== "undefined") {
+			document.querySelectorAll('[data-page-preloader]').forEach((e) => {
+				e.hidden = true;
+				e.classList.remove('active');
+			});
+		}
 
-			// Delete from queue
-			delete queue[url];
+		// Delete from queue
+		delete queue[url];
 
-			switch (status) {
-				case 200: {
-					if (container && !json) {
-						switch (mode) {
-							case 'replace':
-								const template = document.createElement('template');
-								template.innerHTML = data;
-								container.replaceWith(template.content);
-								break;
-							default:
-								container.innerHTML = data;
-						}
-
-					} else {
-
-						if (callback) {
-							if (typeof callback === 'function') {
-								callback(data, contentType);
-							} else if (window[callback] !== undefined) {
-								window[callback].call(this, data, container, contentType);
-							} else {
-								if (callback.indexOf('.') !== -1) {
-									let callbackSplit = callback.split('.'),
-										callbackObject = callbackSplit[0],
-										callbackFunc = callbackSplit[1];
-
-									if (window[callbackObject] !== undefined) {
-										window[callbackObject][callbackFunc].call(this, data, container, contentType);
-									}
-
-								}
-							}
-						} else {
-							if (redirected) {
-								document.location.href = redirected;
-								break;
-							}
-						}
+		switch (status) {
+			case 200: {
+				if (container && !json) {
+					switch (mode) {
+						case 'replace':
+							const template = document.createElement('template');
+							template.innerHTML = data;
+							const replacement = template.content.querySelector('#' + container.id) || template.content;
+							container.removeChild(...container.children);
+							container.appendChild(...replacement.children);
+							break;
+						default:
+							container.innerHTML = data;
 					}
-
-					// Start next request
-					let queueUrls = Object.keys(queue);
-					if (queueUrls.length) {
-						let nextUrl = queueUrls[0],
-							nextQueue = queue[nextUrl];
-
-
-						// return fetchUrl(nextUrl, nextQueue['container'], nextQueue['mode'], nextQueue['callback'], nextQueue.callbackError, nextQueue.changeUrl, nextQueue.method, nextQueue.data, nextQueue.headers);
-					}
-
-					break;
-				}
-				case 400:
-				case 404:
-				case 500: {
-					if (callbackError) {
-						if (typeof callbackError === 'function') {
-							callbackError(data, contentType);
-						} else if (window[callbackError] !== undefined) {
-							window[callbackError].call(this);
-						}
-					}
-
-
-					return Promise.reject([data, contentType]);
-				}
-			}
-
-			container?.dispatchEvent(new CustomEvent('loaded'));
-
-			return Promise.resolve([data, contentType]);
-		})
-		.catch(function (error) {
-
-			container?.dispatchEvent(new CustomEvent('error'));
-
-			delete request[url];
-			if (callbackError) {
-				if (typeof callbackError === 'function') {
-					callbackError(data, contentType);
-				} else if (window[callbackError] !== undefined) {
-					window[callbackError].call(this);
 				} else {
-					callbackError();
+					if (callback) {
+						if (typeof callback === 'function') {
+							callback(data, contentType);
+						} else if (window[callback] !== undefined) {
+							window[callback].call(this, data, container, contentType);
+						} else {
+							if (callback.indexOf('.') !== -1) {
+								let callbackSplit = callback.split('.'),
+									callbackObject = callbackSplit[0],
+									callbackFunc = callbackSplit[1];
+
+								if (window[callbackObject] !== undefined) {
+									window[callbackObject][callbackFunc].call(this, data, container, contentType);
+								}
+
+							}
+						}
+					} else {
+						if (redirected) {
+							document.location.href = redirected;
+							break;
+						}
+					}
 				}
+
+				// Start next request
+				let queueUrls = Object.keys(queue);
+				if (queueUrls.length) {
+					let nextUrl = queueUrls[0],
+						nextQueue = queue[nextUrl];
+
+
+					// return fetchUrl(nextUrl, nextQueue['container'], nextQueue['mode'], nextQueue['callback'], nextQueue.callbackError, nextQueue.changeUrl, nextQueue.method, nextQueue.data, nextQueue.headers);
+				}
+
+				break;
 			}
-		});
+			case 400:
+			case 404:
+			case 500: {
+				if (callbackError) {
+					if (typeof callbackError === 'function') {
+						callbackError(data, contentType);
+					} else if (window[callbackError] !== undefined) {
+						window[callbackError].call(this);
+					}
+				}
+
+				return Promise.reject([data, contentType]);
+			}
+		}
+
+		container?.dispatchEvent(new CustomEvent('loaded'));
+
+		return Promise.resolve([data, contentType]);
+	}).catch(function (error) {
+		container?.dispatchEvent(new CustomEvent('error'));
+
+		delete request[url];
+		if (callbackError) {
+			if (typeof callbackError === 'function') {
+				callbackError(data, contentType);
+			} else if (window[callbackError] !== undefined) {
+				window[callbackError].call(this);
+			} else {
+				callbackError();
+			}
+		}
+	});
 
 };
 

@@ -69,12 +69,32 @@ window.loadAlertModule().then(({Alert, Animation, Icon, Size}) => {
 					el.dataset.callbackError || null,
 					el.dataset.changeurl || false,
 					el.dataset.method || null
-				);
+				).then((data) => {
+					const event = new CustomEvent('ajax.loaded', {
+						detail: {
+							target: el,
+							data: data
+						}
+					});
+
+					el.dispatchEvent(event);
+					document.dispatchEvent(event);
+				}).catch(e => {
+					const event = new CustomEvent('ajax.error', {
+						detail: {
+							target: el,
+							error: e
+						}
+					});
+
+					el.dispatchEvent(event);
+					document.dispatchEvent(event);
+				});
 
 				if (this.dataset.confirm) {
 					new Alert({
-						title: 'Confirm',
-						text: 'Do you want to delete this item?',
+						title: this.dataset.confirm || 'Confirm',
+						text: this.dataset.confirmText || null,
 						animation: Animation.scale,
 						icon: Icon.info,
 						size: Size.default,
@@ -90,12 +110,6 @@ window.loadAlertModule().then(({Alert, Animation, Icon, Size}) => {
 					})
 						.show()
 						.then(() => {
-							new Alert({
-								icon: Icon.success,
-								title: 'Done',
-								timeout: 2000
-							}).show();
-
 							update();
 						});
 				} else {

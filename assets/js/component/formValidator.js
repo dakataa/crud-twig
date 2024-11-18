@@ -17,24 +17,44 @@ import Requester, {RequestBodyType} from "@dakataa/requester";
 			options = getFormOptions(form);
 
 		// Form already submitted
-		if (form.dataset.submitted) {
+		if (form.submitted) {
 			return;
 		}
 
-		form.dataset.submitted = 'true';
+		const toggleButtonLoader = (btn, force) => {
+			if(btn.originalAttributes === undefined) {
+				btn.originalAttributes = btn.attributes;
+				btn.originalInnerHTML = btn.innerHTML;
+			}
 
-		// Disable buttons
-		form.querySelectorAll('button[type="submit"]').forEach(function (btn) {
-			btn.dataset.text = btn.innerHTML;
-			btn.dataset.disabled = btn.disabled;
-			btn.classList.add('disabled');
-			btn.disabled = true;
-			btn.innerHTML = '&nbsp;';
+			const enabled = force !== undefined ? force : btn.hasAttribute('disabled');
 
-			let loader = document.createElement('span');
-			loader.classList.add('loader');
-			btn.appendChild(loader);
-		});
+			btn.classList.toggle('disabled', !enabled);
+			btn.toggleAttribute('disabled', !enabled);
+
+			if(!enabled) {
+				let loader = document.createElement('span');
+				loader.classList.add('loader');
+				btn.innerHTML = '&nbsp';
+				btn.appendChild(loader);
+			} else {
+				btn.innerHTML = btn.originalInnerHTML;
+				// remove loader
+				btn.querySelectorAll('.loader').forEach((i) => i.remove());
+			}
+		}
+
+		const toggleForm = (form, force) => {
+			new Set([
+				...form.querySelectorAll('button[type="submit"]'),
+				...document.querySelectorAll('button[type="submit"][form="' + form.name + '"]')
+			]).forEach((btn) => toggleButtonLoader(btn, force));
+
+			const submitted = force !== undefined ? force : form.submitted;
+			form.submitted = !submitted;
+		}
+
+		toggleForm(form);
 
 		const headers = {
 			accept: 'application/json'
@@ -94,19 +114,7 @@ import Requester, {RequestBodyType} from "@dakataa/requester";
 							formNode.dispatchEvent(new CustomEvent('error', {detail: formView}));
 
 							// Enable buttons
-							formNode.querySelectorAll('button[type="submit"]').forEach(function (btn) {
-								let data = getDataset(btn);
-								btn.classList.remove('disabled');
-								btn.disabled = btn.dataset.disabled === 'true';
-								if (data.text) {
-									btn.innerHTML = data.text;
-								}
-
-								// remove loader
-								btn.querySelectorAll('.loader').forEach((i) => i.remove());
-							});
-
-							delete formNode.dataset.submitted;
+							toggleForm(formNode, true);
 						} else {
 							let objectData = (formView.data || formView);
 
@@ -116,8 +124,8 @@ import Requester, {RequestBodyType} from "@dakataa/requester";
 									cancelable: true
 								}));
 
-								if(isSuccess) {
-									if (data.redirect.url !== undefined) {
+								if (isSuccess) {
+									if (data.redirect?.url !== undefined) {
 										return document.location.href = data.redirect.url
 									}
 
@@ -125,14 +133,18 @@ import Requester, {RequestBodyType} from "@dakataa/requester";
 									formNode.submit();
 								}
 							} catch (e) {
-								console.log('Error in event listener callback');
+								console.log('Error in event listener callback', e);
 							}
 
 						}
 					}
+					const formData = Object.values(data.form || {}).find((f) => f.view.full_name === form.name);
 
-					const formData = Object.values(data.form).find((f) => f.view.full_name === form.name);
-					processForm(form, formData.view, options);
+					if (formData) {
+						processForm(form, formData.view, options);
+					} else {
+						toggleForm(form, true);
+					}
 
 					break;
 				}
@@ -175,9 +187,6 @@ import Requester, {RequestBodyType} from "@dakataa/requester";
 						document.close();
 					}
 				}
-				default: {
-
-				}
 			}
 
 		}).catch((e) => {
@@ -189,15 +198,13 @@ import Requester, {RequestBodyType} from "@dakataa/requester";
 			}
 
 			form.dispatchEvent(new CustomEvent('error'));
+
+			toggleForm(form, true);
 		});
 	}
 
-	const responseHandler = (e) => {
-		validateResponse(e);
-	}
-
 	function getDataset(node) {
-		let data = {};
+		const data = {};
 		Object.keys(node.dataset).map(function (key) {
 			const v = node.dataset[key];
 			data[key] = v === 'true' ? true : v === 'false' ? false : v;
@@ -215,7 +222,7 @@ import Requester, {RequestBodyType} from "@dakataa/requester";
 			alerts: (data.alerts === undefined) ? true : data.alerts,
 			notices: (data.notices === undefined) ? true : data.notices,
 			gotoError: (data.gotoError === undefined) ? true : data.gotoError,
-			contentTarget: (data.contentTarget === undefined) ? false : data.contentTarget,
+			contentTarget: data.contentTarget,
 		};
 	}
 
@@ -237,11 +244,10 @@ import Requester, {RequestBodyType} from "@dakataa/requester";
 		let nodes = formNode.querySelectorAll('[id=' + formFieldId + ']');
 		const message = messages.map(m => m.message).join(' ');
 		if (nodes.length) {
-			let node = nodes[0];
+			const node = nodes[0];
 			let errorMessageNode = formNode.querySelector('#' + node.id + '_error');
 
-			// Mark node as errors
-			nodes.forEach(function (n) {
+			nodes.forEach((n) => {
 				n.classList.add('form-control-error');
 			});
 
@@ -283,7 +289,7 @@ import Requester, {RequestBodyType} from "@dakataa/requester";
 				formNode.insertBefore(errorMsgsHolderNode, formNode.firstChild);
 			}
 
-			let errorMsgNode = document.createElement('div');
+			const errorMsgNode = document.createElement('div');
 			errorMsgNode.innerText = message;
 			errorMsgsHolderNode.append(errorMsgNode);
 		}
