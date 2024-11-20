@@ -91,17 +91,22 @@ class CrudExtension extends AbstractExtension
 	public function getRoute(string $actionName, string $controllerFQCN = null): string
 	{
 		$controllerFQCN ??= $this->getControllerClass();
-		$actions = $this->crudSubscriber->getController()?->getActions();
+		$actions = $this->actionCollection->load($controllerFQCN);
 
-		return (array_values(array_filter($actions, fn(Action $action) => $action->getName() === $actionName)
+		return (array_values(
+			array_filter(
+				iterator_to_array($actions),
+				fn(Action $action) => $action->getName() === $actionName
+			)
 		)[0] ?? null)?->getRoute()->getName() ?? ($controllerFQCN.'::'.$actionName);
 	}
 
-	public function hasAction(string $actionName): bool
+	public function hasAction(string $actionName, string $controllerFQCN = null): bool
 	{
-		$actions = $this->crudSubscriber->getController()?->getActions();
+		$controllerFQCN ??= $this->getControllerClass();
+		$actions = $this->actionCollection->load($controllerFQCN);
 
-		return !empty(array_filter($actions, fn(Action $action) => $action->getName() === $actionName));
+		return !empty(array_filter(iterator_to_array($actions), fn(Action $action) => $action->getName() === $actionName));
 	}
 
 	public function generatePathByAction(Action $action, array $parameters = null): ?string
@@ -135,7 +140,7 @@ class CrudExtension extends AbstractExtension
 		}
 
 		$routeName = $this->getRoute($method, $controllerFqcn);
-		$routePathVariables = $this->router->getRouteCollection()->get($routeName)->compile()->getPathVariables();
+		$routePathVariables = $this->router->getRouteCollection()->get($routeName)?->compile()->getPathVariables() ?: [];
 
 		$currentPathParameters = array_intersect_key(
 			$this->requestStack->getMainRequest()->attributes->all(),
