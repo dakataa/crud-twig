@@ -20,8 +20,7 @@
             {{ _self.filterList(formField) }}
         {% else %}
             <div class="filters-item d-flex text-nowrap flex-column me-2 mb-2">
-                {% set filterVars = form.vars.data|default([])|filter((fv,fk) => fk != formField.vars.name and fv is not empty) %}
-
+                {% set filterVars = form.vars.data|keys|reduce((result, key) => {...result, (key): form.children[key].vars.value}, {})|filter((v, k) => k != formField.vars.name and v is not empty) %}
                 <small class="mb-2">{{ (formField.vars.label ?? formField.vars.name)|capitalize|trans }}</small>
                 <div class="btn btn-sm btn-primary me-1 mb-1">
                     {{ _self.displayFormFieldValue(formField) }}
@@ -121,7 +120,7 @@
         </div>
 
         <div class="d-flex justify-content-center">
-            {% include '@DakataaCrudTwig/paginator.html.twig' with { data: entity.data, action: currentAction} %}
+            {% include '@DakataaCrudTwig/paginator.html.twig' with { data: entity.data, params: app.request.query.all, action: currentAction} %}
         </div>
 
     </section>
