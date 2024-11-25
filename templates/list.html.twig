@@ -1,6 +1,8 @@
 {% extends [getParameter('layout')|default(''), '@DakataaCrudTwig/layout/default/auto.html.twig'] %}
 {% use '@DakataaCrudTwig/components.html.twig' %}
 {% set currentAction = getCurrentAction() %}
+{% set queryParameters = app.request.query.all|map(v => v is iterable ? v|filter(c => c) : v)|filter(v => v) %}
+
 {% block title %}{{ (title ?? 'List')|trans }}{% endblock %}
 {% macro displayFormFieldValue(formField) %}
     {% if formField.vars.choices is defined %}
@@ -8,19 +10,20 @@
         {% set labels = formField.vars.choices|filter(c => c.value in values)|map(v => v.label) %}
         {{ labels|join(',') }}
     {% elseif(formField.vars.checked is defined) %}
-        Checked
+        {{ (formField.vars.checked ? 'Yes' : 'No')|trans }}
     {% else %}
-        {{ formField.vars.data }}
+        {{ formField.vars.data|trans }}
     {% endif %}
 {% endmacro %}
+
 {% macro filterList(form) %}
     {% set currentAction = getCurrentAction() %}
-    {% for formField in form.children|filter(formField => formField.vars.data) %}
+    {% for formField in form.children|filter(formField => formField.vars.data is not null) %}
         {% if formField.children|length %}
             {{ _self.filterList(formField) }}
         {% else %}
             <div class="filters-item d-flex text-nowrap flex-column me-2 mb-2">
-                {% set filterVars = form.vars.data|keys|reduce((result, key) => {...result, (key): form.children[key].vars.value}, {})|filter((v, k) => k != formField.vars.name and v is not empty) %}
+                {% set filterVars = form.vars.data|keys|reduce((result, key) => {...result, (key): form.children[key].vars.value}, {})|filter((v, k) => k != formField.vars.name and v is not null)|filter(v => v) %}
                 <small class="mb-2">{{ (formField.vars.label ?? formField.vars.name)|capitalize|trans }}</small>
                 <div class="btn btn-sm btn-primary me-1 mb-1">
                     {{ _self.displayFormFieldValue(formField) }}
@@ -33,7 +36,7 @@
     {% endfor %}
 {% endmacro %}
 
-{% set hasFilters = form.filter.view.vars.data|default([])|filter(v => v)|length %}
+{% set hasFilters = form.filter.view.vars.data|default([])|filter(v => v is not null)|length %}
 {% block body %}
     <section class="list" id="list-{{ entity.name }}">
         <header class="content-header d-md-flex mb-3 justify-content-between align-items-center">
@@ -108,11 +111,11 @@
             {% block form_end %}
                 {{ form_end(form.batch.view, {'render_rest': false}) }}
             {% endblock %}
-            <form name="limit" onchange="this.requestSubmit()"  method="get">
+            <form name="limit" onchange="this.requestSubmit()" method="get">
                 <label>
                     <select name="limit" class="form-select w-auto mb-2 ms-auto">
                         {% for maxResultChoice in [20, 40, 60, 80, 100] %}
-                            <option {% if maxResultChoice == entity.data.meta.maxResults %}selected="selected"{% endif%} value="{{ maxResultChoice }}">{{ maxResultChoice }}</option>
+                            <option {% if maxResultChoice == entity.data.meta.maxResults %}selected="selected"{% endif %} value="{{ maxResultChoice }}">{{ maxResultChoice }}</option>
                         {% endfor %}
                     </select>
                 </label>
@@ -120,7 +123,7 @@
         </div>
 
         <div class="d-flex justify-content-center">
-            {% include '@DakataaCrudTwig/paginator.html.twig' with { data: entity.data, params: app.request.query.all, action: currentAction} %}
+            {% include '@DakataaCrudTwig/paginator.html.twig' with { data: entity.data, params: queryParameters, action: currentAction} %}
         </div>
 
     </section>
