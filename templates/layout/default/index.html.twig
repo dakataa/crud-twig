@@ -69,13 +69,11 @@
                     {% endfor %}
                 {% endmacro %}
                 {{ _self.list(getNavigation().items) }}
-                <div class="mark">
-                </div>
+                <div class="mark"></div>
             </nav>
         </div>
     {% endif %}
     <div class="content">
-        {#        {% include "layout/component/breadcrumb.html.twig" %} #}
         {% if app.session.flashbag.keys|length %}
             <div class="alert-messages">
                 {% for messageType, messageList in app.session.flashbag.all %}
@@ -129,15 +127,11 @@
 					closestItem = closestItem.parentElement.closest('.item');
 				}
 
-				loadCollapseModule().then((Collapse) => {
-					if (el.closest('.collapse')) {
-						Collapse.getOrCreateInstance(el.closest('.collapse')).show();
-					}
-				});
+				if (el.closest('.collapse')) {
+					el.closest('.collapse').classList.add('show');
+				}
 			});
 		}
-
-		updateNavigationActivity();
 
 		const handleCollapseEvents = function (e) {
 			e.target.closest('.item').classList.toggle('active', e.type === 'show.bs.collapse');
@@ -147,8 +141,9 @@
 			el.addEventListener('show.bs.collapse', handleCollapseEvents);
 			el.addEventListener('hide.bs.collapse', handleCollapseEvents);
 		});
-    </script>
 
+		updateNavigationActivity();
+    </script>
 
     <script type="text/javascript">
 		(() => {
