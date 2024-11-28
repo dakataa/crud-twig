@@ -3,9 +3,9 @@
 namespace Dakataa\Crud\Twig\Extension;
 
 use Dakataa\Crud\Attribute\Action;
-use Dakataa\Crud\DakataaCrudBundle;
 use Dakataa\Crud\EventSubscriber\CrudSubscriber;
 use Dakataa\Crud\Service\ActionCollection;
+use Dakataa\Crud\Twig\DakataaCrudTwigBundle;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -168,6 +168,6 @@ class CrudExtension extends AbstractExtension
 
 	public function getParameter(string $key): mixed
 	{
-		return $this->parameterBag->get(DakataaCrudBundle::NAME)[$key] ?? null;
+		return $this->parameterBag->get(DakataaCrudTwigBundle::NAME)[$key] ?? null;
 	}
 }

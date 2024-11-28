@@ -2,6 +2,7 @@
 
 namespace Dakataa\Crud\Twig;
 
+use Dakataa\Crud\DakataaCrudBundle;
 use Dakataa\Crud\Twig\Extension\CrudExtension;
 use Dakataa\Crud\Twig\Extension\NavigationExtension;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
@@ -18,8 +19,11 @@ class DakataaCrudTwigBundle extends AbstractBundle
 		$definition
 			->rootNode()
 			->children()
-			->variableNode('layout')//->isRequired()
-			->end()
+				->scalarNode('layout')->end()
+				->scalarNode('title')->end()
+				->scalarNode('templatePath')
+					->defaultValue('crud')
+				->end()
 			->end();
 	}
 

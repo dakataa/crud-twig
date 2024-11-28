@@ -1,7 +1,8 @@
+{% set appName = getParameter('title')|default('Admin') %}
 <!DOCTYPE html>
 <html lang="{{ app.request.locale }}">
 <head>
-    <title>{% block title %}Admin{% endblock %}</title>
+    <title>{% block title %}{{ appName }}{% endblock %}</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"/>
     <script type="text/javascript">
@@ -21,7 +22,7 @@
             <i></i>
         </button>
         <nav class="first-nav">
-            <a class="logo" href="#">{{ appName|default('Admin') }}</a>
+            <a class="logo" href="#">{{ appName }}</a>
         </nav>
         <nav class="second-nav">
             {% if is_granted('ROLE_USER') %}

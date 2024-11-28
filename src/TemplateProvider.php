@@ -5,13 +5,13 @@ namespace Dakataa\Crud\Twig;
 use Dakataa\Crud\Controller\AbstractCrudController;
 use Exception;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Environment;
 
 class TemplateProvider
 {
-	public function __construct(protected Environment $twig)
+	public function __construct(protected Environment $twig, protected ParameterBagInterface $params)
 	{
-
 	}
 
 	protected function getTemplateDirectoryByClass(string $controllerClass): string
@@ -35,8 +35,10 @@ class TemplateProvider
 			throw new Exception('Missing Twig Templating Engine.');
 		}
 
+
 		$templatePath = sprintf(
-			'crud/%s/%s.html.twig',
+			'%s/%s/%s.html.twig',
+			$this->params->get(DakataaCrudTwigBundle::NAME)['templatePath'],
 			$this->getTemplateDirectoryByClass($controller->getControllerClass()),
 			$template
 		);
