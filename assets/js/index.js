@@ -56,6 +56,73 @@ document.liveQuery('[data-ajax-load]', function (el) {
 	});
 });
 
+// Class Toggler
+document.liveQuery('[data-toggle="class"]', (el) => {
+	const toggleFunction = (e) => {
+		let target = document.querySelector(el.dataset.target),
+			skipElement = document.querySelector(el.dataset.skip) || target,
+			toggleClassName = el.dataset.class || 'show',
+			selfClassName = el.dataset.selfClass,
+			callback = el.dataset.callback,
+			clickedEl = e.targetTouches && e.targetTouches.length ? e.targetTouches[0].target : e.target;
+
+		if (clickedEl instanceof Document) {
+			clickedEl = null;
+		}
+
+		if (!target) {
+			return;
+		}
+
+		if (target.classList.contains(toggleClassName) && (skipElement && skipElement.contains(clickedEl)) && !(clickedEl && clickedEl.closest('[data-toggle="class"]') && clickedEl.closest('[data-toggle="class"]').contains(clickedEl))) {
+			return;
+		}
+
+		e.stopPropagation();
+
+
+		if (el.contains(clickedEl) || !(clickedEl && clickedEl.closest('a') && clickedEl.closest('a').contains(clickedEl))) {
+			e.preventDefault();
+			document.activeElement.blur();
+		}
+
+		const isAdded = target.classList.toggle(toggleClassName);
+
+		if (selfClassName !== undefined && selfClassName) {
+			el.classList.toggle(selfClassName);
+		}
+
+		document.removeEventListener('click', toggleFunction, true);
+		document.removeEventListener('touchend', toggleFunction, true);
+
+		if (isAdded) {
+			document.addEventListener('click', toggleFunction, true);
+			document.addEventListener('touchend', toggleFunction, true);
+		}
+
+		if (callback) {
+			if (typeof callback === 'function') {
+				callback(el, target, isAdded);
+			} else if (window[callback] !== undefined) {
+				window[callback].call(this, el, target, isAdded);
+			} else {
+				if (callback.indexOf('.') !== -1) {
+					let callbackSplit = callback.split('.'),
+						callbackObject = callbackSplit[0],
+						callbackFunc = callbackSplit[1];
+
+					if (window[callbackObject] !== undefined) {
+						window[callbackObject][callbackFunc].call(this, el, target, isAdded);
+					}
+				}
+			}
+		}
+
+	};
+
+	el.addEventListener('click', toggleFunction, true);
+});
+
 window.loadAlertModule().then(({Alert, Animation, Icon, Size}) => {
 	document.liveQuery('[data-toggle="ajax"]', function (el) {
 		window.loadDataFetcherModule().then((dataFetcher) => {
