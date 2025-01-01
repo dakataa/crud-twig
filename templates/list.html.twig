@@ -18,7 +18,7 @@
 
 {% macro filterList(form) %}
     {% set currentAction = getCurrentAction() %}
-    {% for formField in form.children|filter(formField => formField.vars.data is not null) %}
+    {% for formField in form.children|filter(formField => formField.vars.data|default(null) is not null) %}
         {% if formField.children|length %}
             {{ _self.filterList(formField) }}
         {% else %}
