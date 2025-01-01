@@ -19,7 +19,7 @@
 {% macro filterList(form) %}
     {% set currentAction = getCurrentAction() %}
     {% for formField in form.children|filter(formField => formField.vars.data|default(null) is not null) %}
-        {% if formField.children|length %}
+        {% if formField.children|length and formField.vars.choices is empty %}
             {{ _self.filterList(formField) }}
         {% else %}
             <div class="filters-item d-flex text-nowrap flex-column me-2 mb-2">
