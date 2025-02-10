@@ -2,6 +2,7 @@
 {% use '@DakataaCrudTwig/components.html.twig' %}
 {% set currentAction = getCurrentAction() %}
 {% set queryParameters = app.request.query.all|map(v => v is iterable ? v|filter(c => c) : v)|filter(v => v) %}
+{% set actions = action|filter(a => false == a.object and a.name != currentAction.name) %}
 
 {% block title %}{{ (title ?? 'List')|trans }}{% endblock %}
 {% macro displayFormFieldValue(formField) %}
@@ -48,13 +49,15 @@
 
             {% block body_navigation %}
                 <div class="d-flex align-items-center">
+                    {% if actions|length %}
                     <nav class="btn-group btn-group-sm me-2">
-                        {% for action in action|filter(a => false == a.object and a.name != currentAction.name) %}
+                        {% for action in actions %}
                             <a href="{{ generatePathByAction(action) }}" data-action="{{ action.name }}" class="btn btn-outline-secondary">
                                 {{ action.title|trans }}
                             </a>
                         {% endfor %}
                     </nav>
+                    {% endif %}
 
                     {% if form.filter %}
                         <div class="btn-group btn-group-sm">

@@ -2,10 +2,10 @@
   "entrypoints": {
     "theme": {
       "css": [
-        "/bundles/dakataacrudtwig/assets/theme.ccef87f0.css"
+        "/bundles/dakataacrudtwig/assets/theme.3cd5aff5.css"
       ],
       "js": [
-        "/bundles/dakataacrudtwig/assets/theme.83f974ec.js"
+        "/bundles/dakataacrudtwig/assets/theme.416a1a9a.js"
       ]
     }
   }
