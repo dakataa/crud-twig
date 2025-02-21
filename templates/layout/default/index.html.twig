@@ -28,13 +28,13 @@
             {% if is_granted('ROLE_USER') %}
                 <div class="user dropdown">
                     <a class="avatar" data-bs-toggle="dropdown">
-                        <span class="initials">{{ app.user.firstName }}</span>
+                        <span class="initials">User</span>
                     </a>
                     <div class="dropdown-menu">
                         <div class="dropdown-item">
-                            {{ app.user.name ?? 'Unknown' }}
+                            First Last
                         </div>
-                        <a class="dropdown-item" href="{{ url('logout') }}">
+                        <a class="dropdown-item" href="#">
                             <i class="fas fa-power"></i> {{ 'Logout'|trans }}
                         </a>
                     </div>
