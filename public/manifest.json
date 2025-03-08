@@ -1,0 +1,13 @@
+{
+	"short_name": "Crud",
+	"name": "Crud",
+	"start_url": "assets/sw.js",
+	"background_color": "#ffffff",
+	"display": "standalone",
+	"scope": "/",
+	"theme_color": "#3367D6",
+	"shortcuts": [
+	],
+	"screenshots": [
+	]
+}

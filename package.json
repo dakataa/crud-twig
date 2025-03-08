@@ -4,7 +4,7 @@
 		"@babel/plugin-transform-runtime": "^7.16.0",
 		"@babel/plugin-transform-template-literals": "^7.13.0",
 		"@babel/preset-env": "^7.14.2",
-		"@symfony/webpack-encore": "^5.0.1",
+		"@symfony/webpack-encore": "^5.1.0",
 		"autoprefixer": "^10.2.6",
 		"babel-loader": "^9.2.1",
 		"clean-css": "^5.3.3",
@@ -21,12 +21,13 @@
 	},
 	"dependencies": {
 		"@dakataa/bootstrap-alert": "^1.0.0",
-		"@dakataa/crud-theme": "^1.0.0",
+		"@dakataa/crud-theme": "^1.0.1",
 		"@dakataa/requester": "^1.0.0",
 		"@popperjs/core": "^2.11.5",
 		"bootstrap": "^5.3.3",
 		"encore": "^0.0.30-beta",
-		"lottie-web": "^5.12.2"
+		"lottie-web": "^5.12.2",
+		"webpack": "^5.98.0"
 	},
 	"browserslist": [
 		"> 0.5%",
